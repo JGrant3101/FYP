@@ -1,0 +1,585 @@
+MATLAB version 9.12.0.1975300 (R2022a) Update 3 on architecture win64
+
+run: { runid='lab=13' toolbox='empty' tbxctor=@empty_ctor isol_type='' sol_type='' dir='C:\Users\ludov\OneDrive\Documents\MATLAB\Demo-COCO\coco_2020Mar22\coco\po\examples\bistable\data\lab=13' bdfname='C:\Users\ludov\OneDrive\Documents\MATLAB\Demo-COCO\coco_2020Mar22\coco\po\examples\bistable\data\lab=13\bd.mat' logname='C:\Users\ludov\OneDrive\Documents\MATLAB\Demo-COCO\coco_2020Mar22\coco\po\examples\bistable\data\lab=13\coco_log.txt' scrname='C:\Users\ludov\OneDrive\Documents\MATLAB\Demo-COCO\coco_2020Mar22\coco\po\examples\bistable\data\lab=13\coco_scr.txt' }
+
+all: { TOL=1e-06 CleanData=false LogLevel=1 data_dir='C:\Users\ludov\OneDrive\Documents\MATLAB\Demo-COCO\coco_2020Mar22\coco\po\examples\bistable\data' }
+  +-ode: { autonomous=false }
+  +-po: { bifus='off' }
+  +-cont: { NAdapt=10 }
+  +-lsol: { det=true }
+
+funcs
+  +-po: { type='zero' }
+  | +-orb
+  | | +-coll: { type='zero' }
+  | |   +-pars: { type='inactive' pars={ 'T' 'A' 'd' } }
+  | |   +-err: { type='regular' pars={ 'po.orb.coll.err' 'po.orb.coll.err_TF' } }
+  | |   +-test: { type='regular' }
+  | +-tinit: { type='inactive' pars={ 'po.tinit' } }
+  | +-period: { type='inactive' pars={ 'po.period' } }
+  +-glue: { type='zero' }
+  +-cseg
+  | +-prcond: { type='zero' }
+  +-atlas
+    +-test
+      +-BP: { type='singular' pars={ 'atlas.test.BP' } }
+      +-FP: { type='singular' pars={ 'atlas.test.FP' } }
+
+slots
+  +-po: { signals={ 'bddat@bddat' 'save_full@coco_save_data' } }
+  | +-orb
+  |   +-coll: { signals={ 'bddat@bddat' 'save_full@coco_save_data' } }
+  |   | +-test: { signal='update@var_update' }
+  |   +-tb_info: { signals={ 'save_bd@coco_save_data' 'save_reduced@coco_save_data' } }
+  +-cseg
+  | +-fix_mfunc: { signal='fix_mfunc@CurveSegmentBase.fix_mfunc' }
+  | +-remesh: { signal='remesh@CurveSegmentBase.remesh' }
+  | +-set_mode: { signal='set_mode@CurveSegmentBase.set_mode' }
+  | +-update: { signal='update@CurveSegmentBase.update' }
+  | +-update_h: { signal='update_h@CurveSegmentBase.update_h' }
+  | +-update_w: { signal='update_w@CurveSegmentBase.update_w' }
+  +-tb_info: { signals={ 'save_bd@coco_save_data' 'save_reduced@coco_save_data' } }
+  +-run: { signal='save_bd@save_run' }
+  +-bd: { signal='save_bd@save_bd' }
+  +-bddat: { signal='save_bd@save_bddat' }
+  +-lsol
+    +-det: { signal='set_mode@set_save_det' }
+
+signals
+  +-save_bd: { owner='coco' slots={ 'po.orb.tb_info@coco_save_data' 'tb_info@coco_save_data' 'run@save_run' 'bd@save_bd' 'bddat@save_bddat' } }
+  +-update: { owner='CurveSegmentBase' slots={ 'po.orb.coll.test@var_update' 'cseg.update@CurveSegmentBase.update' } }
+  +-set_mode: { owner='CurveSegmentBase' slots={ 'cseg.set_mode@CurveSegmentBase.set_mode' 'lsol.det@set_save_det' } }
+  +-update_h: { owner='CurveSegmentBase' slots={ 'cseg.update_h@CurveSegmentBase.update_h' } }
+  +-fix_mfunc: { owner='CurveSegmentBase' slots={ 'cseg.fix_mfunc@CurveSegmentBase.fix_mfunc' } }
+  +-remesh: { owner='atlas_1d' slots={ 'cseg.remesh@CurveSegmentBase.remesh' } }
+  +-bddat: { owner='AtlasBase' slots={ 'po.orb.coll@bddat' 'po@bddat' } }
+  +-save_full: { owner='AtlasBase' slots={ 'po.orb.coll@coco_save_data' 'po@coco_save_data' } }
+  +-save_reduced: { owner='AtlasBase' slots={ 'po.orb.tb_info@coco_save_data' 'tb_info@coco_save_data' } }
+
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          4.75e-15  1.18e+01    0.0    0.0    0.0
+init_chart: init_chart: angle(t,t216) =  9.00e+01[DEG]
+init_chart: init_chart: angle(t,t217) =  9.00e+01[DEG]
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    0    1.00e-01  00:00:00   1.1817e+01      1  EP      5.6029e+00   5.6029e+00
+
+POINT 0: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          5.67e-05  1.18e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.08e-03  7.99e-09  1.18e+01    0.0    0.0    0.0
+   2   1  1.00e+00  6.90e-07  1.92e-15  1.18e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    1    1.90e-01  00:00:00   1.1817e+01      2  FP      5.6029e+00   5.6029e+00
+    1    1.90e-01  00:00:00   1.1786e+01                 5.6025e+00   5.6025e+00
+
+POINT 1: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.04e-04  1.17e+01    0.0    0.0    0.0
+   1   1  1.00e+00  4.09e-03  1.09e-07  1.17e+01    0.0    0.0    0.0
+   2   1  1.00e+00  9.14e-06  2.28e-13  1.17e+01    0.0    0.0    0.0
+   3   1  1.00e+00  7.66e-12  1.11e-15  1.17e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    2    3.58e-01  00:00:00   1.1724e+01                 5.5994e+00   5.5994e+00
+
+POINT 2: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.17e-04  1.16e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.61e-02  1.51e-06  1.16e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.19e-04  3.52e-11  1.16e+01    0.0    0.0    0.0
+   3   1  1.00e+00  9.98e-10  1.10e-15  1.16e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    3    3.20e-01  00:00:00   1.1596e+01                 5.5840e+00   5.5840e+00
+
+POINT 3: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          5.90e-04  1.15e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.50e-02  1.10e-06  1.15e+01    0.0    0.0    0.0
+   2   1  1.00e+00  8.28e-05  1.54e-11  1.15e+01    0.0    0.0    0.0
+   3   1  1.00e+00  2.07e-10  9.63e-16  1.15e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    4    2.75e-01  00:00:00   1.1465e+01                 5.5574e+00   5.5574e+00
+
+POINT 4: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          4.50e-04  1.13e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.27e-02  6.97e-07  1.13e+01    0.0    0.0    0.0
+   2   1  1.00e+00  4.75e-05  5.51e-12  1.13e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.99e-10  9.83e-16  1.13e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    5    2.39e-01  00:00:00   1.1336e+01                 5.5230e+00   5.5230e+00
+
+POINT 5: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          3.52e-04  1.12e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.08e-02  4.81e-07  1.12e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.81e-05  2.61e-12  1.12e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.41e-10  8.10e-16  1.12e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    6    2.12e-01  00:00:00   1.1211e+01                 5.4831e+00   5.4831e+00
+
+POINT 6: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.88e-04  1.11e+01    0.0    0.0    0.0
+   1   1  1.00e+00  9.41e-03  3.72e-07  1.11e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.84e-05  1.45e-12  1.11e+01    0.0    0.0    0.0
+   3   1  1.00e+00  8.24e-11  7.64e-16  1.11e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    7    1.95e-01  00:00:00   1.1086e+01                 5.4390e+00   5.4390e+00
+
+POINT 7: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.47e-04  1.10e+01    0.0    0.0    0.0
+   1   1  1.00e+00  8.41e-03  3.13e-07  1.10e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.35e-05  8.84e-13  1.10e+01    0.0    0.0    0.0
+   3   1  1.00e+00  4.81e-11  7.44e-16  1.10e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    8    1.84e-01  00:00:00   1.0961e+01                 5.3911e+00   5.3911e+00
+
+POINT 8: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.22e-04  1.08e+01    0.0    0.0    0.0
+   1   1  1.00e+00  7.75e-03  2.79e-07  1.08e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.11e-05  6.03e-13  1.08e+01    0.0    0.0    0.0
+   3   1  1.00e+00  3.00e-11  6.24e-16  1.08e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    9    1.79e-01  00:00:00   1.0833e+01                 5.3394e+00   5.3394e+00
+
+POINT 9: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.09e-04  1.07e+01    0.0    0.0    0.0
+   1   1  1.00e+00  7.36e-03  2.60e-07  1.07e+01    0.0    0.0    0.0
+   2   1  1.00e+00  9.74e-06  4.62e-13  1.07e+01    0.0    0.0    0.0
+   3   1  1.00e+00  2.07e-11  6.87e-16  1.07e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   10    1.78e-01  00:00:00   1.0700e+01      3          5.2833e+00   5.2833e+00
+
+POINT 10: computation finished
+*********************************************************************
+coco_remesh: mesh accepted after 1 trials
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.07e-04  1.07e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.54e-04  1.24e-10  1.07e+01    0.0    0.0    0.0
+   2   1  1.00e+00  8.05e-10  6.72e-16  1.07e+01    0.0    0.0    0.0
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.17e-04  1.06e+01    0.0    0.0    0.0
+   1   1  1.00e+00  7.29e-03  2.67e-07  1.06e+01    0.0    0.0    0.0
+   2   1  1.00e+00  9.30e-06  4.27e-13  1.06e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.66e-11  5.67e-16  1.06e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   11    1.81e-01  00:00:00   1.0552e+01                 5.2210e+00   5.2210e+00
+
+POINT 11: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.14e-04  1.04e+01    0.0    0.0    0.0
+   1   1  1.00e+00  7.09e-03  2.49e-07  1.04e+01    0.0    0.0    0.0
+   2   1  1.00e+00  8.36e-06  3.36e-13  1.04e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.20e-11  5.25e-16  1.04e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   12    1.92e-01  00:00:00   1.0401e+01                 5.1530e+00   5.1530e+00
+
+POINT 12: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.28e-04  1.02e+01    0.0    0.0    0.0
+   1   1  1.00e+00  7.36e-03  2.59e-07  1.02e+01    0.0    0.0    0.0
+   2   1  1.00e+00  8.36e-06  3.24e-13  1.02e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.08e-11  5.17e-16  1.02e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   13    2.09e-01  00:00:00   1.0234e+01                 5.0763e+00   5.0763e+00
+
+POINT 13: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.52e-04  1.00e+01    0.0    0.0    0.0
+   1   1  1.00e+00  7.82e-03  2.78e-07  1.00e+01    0.0    0.0    0.0
+   2   1  1.00e+00  8.55e-06  3.21e-13  1.00e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.01e-11  4.21e-16  1.00e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   14    2.34e-01  00:00:00   1.0046e+01                 4.9884e+00   4.9884e+00
+
+POINT 14: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.89e-04  9.83e+00    0.0    0.0    0.0
+   1   1  1.00e+00  8.54e-03  3.08e-07  9.83e+00    0.0    0.0    0.0
+   2   1  1.00e+00  8.95e-06  3.27e-13  9.83e+00    0.0    0.0    0.0
+   3   1  1.00e+00  9.63e-12  5.22e-16  9.83e+00    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   15    2.70e-01  00:00:00   9.8294e+00                 4.8857e+00   4.8857e+00
+
+POINT 15: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          3.45e-04  9.58e+00    0.0    0.0    0.0
+   1   1  1.00e+00  9.59e-03  3.52e-07  9.57e+00    0.0    0.0    0.0
+   2   1  1.00e+00  9.59e-06  3.41e-13  9.57e+00    0.0    0.0    0.0
+   3   1  1.00e+00  9.35e-12  3.38e-16  9.57e+00    0.0    0.0    0.0
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          4.80e-04  9.72e+00    0.0    0.0    0.0
+   1   1  1.00e+00  1.06e-03  5.00e-09  9.72e+00    0.0    0.0    0.0
+   2   1  1.00e+00  1.58e-07  3.49e-16  9.72e+00    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   16    3.23e-01  00:00:00   9.7197e+00      4  EP      4.8332e+00   4.8332e+00
+
+POINT 16: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          5.77e-05  1.18e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.06e-03  7.82e-09  1.18e+01    0.0    0.0    0.0
+   2   1  1.00e+00  7.09e-07  1.97e-15  1.18e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    0    1.00e-01  00:00:00   1.1817e+01      5  EP      5.6029e+00   5.6029e+00
+    1    1.90e-01  00:00:00   1.1847e+01                 5.6026e+00   5.6026e+00
+
+POINT 1: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.09e-04  1.19e+01    0.0    0.0    0.0
+   1   1  1.00e+00  3.68e-03  9.85e-08  1.19e+01    0.0    0.0    0.0
+   2   1  1.00e+00  9.13e-06  2.57e-13  1.19e+01    0.0    0.0    0.0
+   3   1  1.00e+00  9.06e-12  1.54e-15  1.19e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    2    3.61e-01  00:00:00   1.1902e+01                 5.5999e+00   5.5999e+00
+
+POINT 2: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.61e-04  1.20e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.25e-02  1.21e-06  1.20e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.17e-04  4.47e-11  1.20e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.63e-09  1.53e-15  1.20e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    3    4.35e-01  00:00:00   1.2002e+01                 5.5886e+00   5.5886e+00
+
+POINT 3: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.10e-03  1.21e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.69e-02  2.36e-06  1.21e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.29e-04  1.83e-10  1.21e+01    0.0    0.0    0.0
+   3   1  1.00e+00  6.95e-09  1.54e-15  1.21e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    4    4.69e-01  00:00:00   1.2117e+01                 5.5663e+00   5.5663e+00
+
+POINT 4: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.26e-03  1.22e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.86e-02  2.93e-06  1.22e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.80e-04  2.87e-10  1.22e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.12e-08  2.05e-15  1.22e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    5    4.96e-01  00:00:00   1.2237e+01                 5.5343e+00   5.5343e+00
+
+POINT 5: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.40e-03  1.24e+01    0.0    0.0    0.0
+   1   1  1.00e+00  2.00e-02  3.41e-06  1.24e+01    0.0    0.0    0.0
+   2   1  1.00e+00  3.16e-04  3.83e-10  1.24e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.53e-08  2.18e-15  1.24e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    6    5.00e-01  00:00:00   1.2364e+01                 5.4940e+00   5.4940e+00
+
+POINT 6: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.40e-03  1.25e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.99e-02  3.31e-06  1.25e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.92e-04  3.40e-10  1.25e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.38e-08  2.04e-15  1.25e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    7    5.00e-01  00:00:00   1.2494e+01                 5.4486e+00   5.4486e+00
+
+POINT 7: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.38e-03  1.26e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.96e-02  3.16e-06  1.26e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.64e-04  2.84e-10  1.26e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.18e-08  2.34e-15  1.26e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    8    5.00e-01  00:00:00   1.2629e+01                 5.4002e+00   5.4002e+00
+
+POINT 8: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.36e-03  1.28e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.95e-02  3.05e-06  1.28e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.39e-04  2.38e-10  1.28e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.01e-08  2.46e-15  1.28e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+    9    5.00e-01  00:00:01   1.2769e+01                 5.3500e+00   5.3500e+00
+
+POINT 9: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.35e-03  1.29e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.94e-02  2.97e-06  1.29e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.18e-04  2.01e-10  1.29e+01    0.0    0.0    0.0
+   3   1  1.00e+00  8.78e-09  2.46e-15  1.29e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   10    5.00e-01  00:00:01   1.2914e+01      6          5.2989e+00   5.2989e+00
+
+POINT 10: computation finished
+*********************************************************************
+coco_remesh: mesh accepted after 1 trials
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.84e-03  1.28e+01    0.0    0.0    0.0
+   1   1  1.00e+00  5.33e-04  9.33e-09  1.28e+01    0.0    0.0    0.0
+   2   1  1.00e+00  4.08e-08  2.55e-15  1.28e+01    0.0    0.0    0.0
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.41e-03  1.30e+01    0.0    0.0    0.0
+   1   1  1.00e+00  2.01e-02  3.28e-06  1.29e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.19e-04  2.16e-10  1.29e+01    0.0    0.0    0.0
+   3   1  1.00e+00  9.21e-09  2.70e-15  1.29e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   11    5.00e-01  00:00:01   1.2947e+01                 5.2464e+00   5.2464e+00
+
+POINT 11: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.40e-03  1.31e+01    0.0    0.0    0.0
+   1   1  1.00e+00  2.00e-02  3.20e-06  1.31e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.01e-04  1.82e-10  1.31e+01    0.0    0.0    0.0
+   3   1  1.00e+00  8.01e-09  2.74e-15  1.31e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   12    5.00e-01  00:00:01   1.3095e+01                 5.1946e+00   5.1946e+00
+
+POINT 12: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.39e-03  1.33e+01    0.0    0.0    0.0
+   1   1  1.00e+00  2.00e-02  3.13e-06  1.32e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.86e-04  1.55e-10  1.32e+01    0.0    0.0    0.0
+   3   1  1.00e+00  7.02e-09  2.94e-15  1.32e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   13    5.00e-01  00:00:01   1.3248e+01                 5.1439e+00   5.1439e+00
+
+POINT 13: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.38e-03  1.34e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.99e-02  3.07e-06  1.34e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.74e-04  1.33e-10  1.34e+01    0.0    0.0    0.0
+   3   1  1.00e+00  6.18e-09  2.84e-15  1.34e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   14    5.00e-01  00:00:01   1.3404e+01                 5.0946e+00   5.0946e+00
+
+POINT 14: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.38e-03  1.36e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.98e-02  3.01e-06  1.36e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.63e-04  1.16e-10  1.36e+01    0.0    0.0    0.0
+   3   1  1.00e+00  5.48e-09  3.02e-15  1.36e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   15    5.00e-01  00:00:01   1.3563e+01                 5.0471e+00   5.0471e+00
+
+POINT 15: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.38e-03  1.37e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.97e-02  2.96e-06  1.37e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.54e-04  1.03e-10  1.37e+01    0.0    0.0    0.0
+   3   1  1.00e+00  4.89e-09  3.43e-15  1.37e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   16    5.00e-01  00:00:01   1.3723e+01                 5.0016e+00   5.0016e+00
+
+POINT 16: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.38e-03  1.39e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.96e-02  2.91e-06  1.39e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.47e-04  9.14e-11  1.39e+01    0.0    0.0    0.0
+   3   1  1.00e+00  4.39e-09  3.44e-15  1.39e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   17    5.00e-01  00:00:01   1.3883e+01                 4.9583e+00   4.9583e+00
+
+POINT 17: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.39e-03  1.41e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.94e-02  2.86e-06  1.40e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.40e-04  8.22e-11  1.40e+01    0.0    0.0    0.0
+   3   1  1.00e+00  3.96e-09  3.55e-15  1.40e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   18    5.00e-01  00:00:01   1.4043e+01                 4.9171e+00   4.9171e+00
+
+POINT 18: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.40e-03  1.42e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.93e-02  2.81e-06  1.42e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.35e-04  7.46e-11  1.42e+01    0.0    0.0    0.0
+   3   1  1.00e+00  3.58e-09  3.83e-15  1.42e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   19    5.00e-01  00:00:01   1.4201e+01                 4.8783e+00   4.8783e+00
+
+POINT 19: computation finished
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.40e-03  1.44e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.91e-02  2.77e-06  1.44e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.30e-04  6.80e-11  1.44e+01    0.0    0.0    0.0
+   3   1  1.00e+00  3.25e-09  3.42e-15  1.44e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   20    5.00e-01  00:00:01   1.4357e+01      7          4.8417e+00   4.8417e+00
+
+POINT 20: computation finished
+*********************************************************************
+coco_remesh: mesh accepted after 1 trials
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.84e-03  1.49e+01    0.0    0.0    0.0
+   1   1  1.00e+00  7.15e-04  4.84e-09  1.49e+01    0.0    0.0    0.0
+   2   1  1.00e+00  2.61e-08  4.27e-15  1.49e+01    0.0    0.0    0.0
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          1.12e-03  1.51e+01    0.0    0.0    0.0
+   1   1  1.00e+00  1.80e-02  1.99e-06  1.51e+01    0.0    0.0    0.0
+   2   1  1.00e+00  1.03e-04  3.36e-11  1.51e+01    0.0    0.0    0.0
+   3   1  1.00e+00  1.84e-09  3.95e-15  1.51e+01    0.0    0.0    0.0
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          2.04e-04  1.50e+01    0.0    0.0    0.0
+   1   1  1.00e+00  3.12e-03  4.32e-08  1.50e+01    0.0    0.0    0.0
+   2   1  1.00e+00  9.31e-07  5.78e-15  1.50e+01    0.0    0.0    0.0
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE     po.period            T
+   21    5.00e-01  00:00:01   1.4968e+01      8  EP      4.8332e+00   4.8332e+00
+
+POINT 21: computation finished
+*********************************************************************
