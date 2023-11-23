@@ -15,11 +15,11 @@ view(ax, 3);
 %% Generate an initial solution by simulation
 
 p0 = [0.01, 1, 0.1, 0.1, 0.4]'; % Initial parameter values
-%sol = ode45(@(t, x)duffing(t, x, p0), [0, 10], zeros(2, 1), odeset('RelTol', 1e-8)); % Simulate
+sol = ode45(@(t, x)duffing(t, x, p0), [0, 10], zeros(2, 1), odeset('RelTol', 1e-8)); % Simulate
 t0 = linspace(0, 1, 101)'; % 101 data points initially
-%x0 = deval(sol, sol.x(end) - t0(end) + t0)'; % Interpolate to get the required data
+x0 = deval(sol, sol.x(end) - t0(end) + t0)'; % Interpolate to get the required data
 
-x0 = zeros(length(t0), 2);
+%x0 = zeros(length(t0), 2);
 
 %% Do an initial continuation in p2 to generate starting points for further continuation
 
