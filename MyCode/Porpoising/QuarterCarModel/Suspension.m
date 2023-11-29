@@ -43,6 +43,7 @@ rhs(4, :) = (Ks./Mu) .* x(1, :) - ((Ks./Mu) + (Kt./Mu)) * x(2, :) + (Cs./Mu) * x
 % Returning values of interest
 VarOfInterest(1, 1) = DWFUpper;
 VarOfInterest(2, 1) = DWFFloorValue;
+VarOfInterest(3, 1) = h;
 end
 
 
