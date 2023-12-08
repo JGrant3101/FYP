@@ -4,7 +4,7 @@ function InvGauss = DWFFloor(h, mew, lamda, scaling)
 % Determining the InvGauss values
 InvGauss = sqrt((lamda/2*pi)./h.^2) .* exp(-(lamda*(h-mew).^2)./(2*mew^2.*h));
 % Scaling the output
-%InvGauss = InvGauss*scaling;
+InvGauss = InvGauss*scaling;
 % Replacing any NaN values with 0, in early testing these have only popped
 % up when ride height is 0 so for the moment this is fine to do (23/11/2023)
 InvGauss(isnan(InvGauss), 1) = 0;

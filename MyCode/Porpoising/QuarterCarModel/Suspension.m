@@ -1,5 +1,5 @@
 %% Defining the suspension system of the car, this also includes the tyre stiffness.
-function [rhs, VarOfInterest] = Suspension(t, x, p)
+function rhs = Suspension(t, x, p)
 % Firslty defining the constant terms
 % Sprung mass
 Ms = p(1, :);
@@ -14,7 +14,7 @@ Kt = p(5, :);
 % Static ride height
 H = p(6, :);
 % Car speed
-vCar = p(7, :);
+vCar = ((p(7, :).*10^3)./(60*60));
 % Upper downforce elements multiplier
 A = p(8, :);
 % Mew for Inverse Gaussian distribution
@@ -38,12 +38,12 @@ rhs = zeros(size(x));
 rhs(1, :) = x(3, :);
 rhs(2, :) = x(4, :);
 rhs(3, :) = -(Ks./Ms) .* x(1, :) + (Ks./Ms) .* x(2, :) - (Cs./Ms) .* x(3, :) + (Cs./Ms) .* x(4, :) - (DWFUpper + DWFFloorValue)./Ms; % This also has the variable downforce component dependent on Vcar and ride height which will be added
-rhs(4, :) = (Ks./Mu) .* x(1, :) - ((Ks./Mu) + (Kt./Mu)) * x(2, :) + (Cs./Mu) * x(3, :) - (Cs./Mu) .* x(4, :);
+rhs(4, :) = (Ks./Mu) .* x(1, :) - ((Ks./Mu) + (Kt./Mu)) .* x(2, :) + (Cs./Mu) .* x(3, :) - (Cs./Mu) .* x(4, :);
 
 % Returning values of interest
-VarOfInterest(1, 1) = DWFUpper;
-VarOfInterest(2, 1) = DWFFloorValue;
-VarOfInterest(3, 1) = h;
+% VarOfInterest(1, 1) = DWFUpper;
+% VarOfInterest(2, 1) = DWFFloorValue;
+% VarOfInterest(3, 1) = h;
 end
 
 

@@ -14,12 +14,12 @@ view(ax, 3);
 
 %% Generate an initial solution by simulation
 
-p0 = [180, 50, 30000, 2000, 270000, 500/9, 0.365, 0.365]'; % Initial parameter values
-%sol = ode45(@(t, x)duffing(t, x, p0), [0, 10], zeros(2, 1), odeset('RelTol', 1e-8)); % Simulate
+p0 = [180, 50, 10^5, 3400, 2.7 * 10^6, 0.1, 320, 0.365, 0.033, 0.07, 0.1*(500/9)^2]'; % Initial parameter values
+sol = ode45(@(t, x)Suspension(t, x, p0), [0, 10], zeros(4, 1), odeset('RelTol', 1e-8)); % Simulate
 t0 = linspace(0, 1, 101)'; % 101 data points initially
 %x0 = deval(sol, sol.x(end) - t0(end) + t0)'; % Interpolate to get the required data
 
-x0 = zeros(length(t0), 2);
+x0 = zeros(length(t0), 4);
 
 %% Do an initial continuation in p2 to generate starting points for further continuation
 
@@ -46,11 +46,11 @@ prob = ode_isol2po(prob, ...
     @Suspension, ...     % Right-hand side of equations of motion (optionally the derivatives can also be provided to improve speed)
     t0, ...           % Mesh for the initial solution
     x0, ...           % Initial solution
-    {'Ms', 'Mu', 'Ks', 'Cs', 'Kt', 'Vcar', 'A', 'B'}, ... % Parameter names
+    {'Ms', 'Mu', 'Ks', 'Cs', 'Kt', 'H', 'vCar', 'A', 'mew', 'lamda', 'scaling'}, ... % Parameter names
     p0);              % Initial parameter values
 
 % Add a user defined event to output the values at certain parameter values
-prob = coco_add_event(prob, 'UZ', 'Vcar', [100, 150, 200, 250, 300]); % Output when Gamma = 0.05, 0.1 or 0.2
+prob = coco_add_event(prob, 'UZ', 'vCar', [100, 150, 200, 250, 300]); % Output when Gamma = 0.05, 0.1 or 0.2
 
 % Tell COCO to store extra information about the periodic orbits
 prob = coco_add_slot(prob, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
@@ -60,12 +60,12 @@ prob = coco_add_slot(prob, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
 bd0 = coco(prob, ...
     'run0', ...             % Name of the continuation run (arbitrary) used for future references
     [], ...                 % Continuation problem is already defined by ode_isol2ep so this term is empty
-    'Gamma', ...            % Continuation parameter
-    [0.01, 0.25]);          % Parameter range of interest
+    'vCar', ...            % Continuation parameter
+    [100, 150, 200, 250, 300]);          % Parameter range of interest
 
 % Get the data for plotting
-p1 = coco_bd_col(bd0, 'Omega'); % Get the Omega parameter
-p2 = coco_bd_col(bd0, 'Gamma'); % Get the Gamma parameter
+p1 = coco_bd_col(bd0, 'vCar'); % Get the Omega parameter
+p2 = coco_bd_col(bd0, 'Ks'); % Get the Gamma parameter
 x_max = coco_bd_col(bd0, 'x_max')';   % Get the state vector
 stab = coco_bd_col(bd0, 'po.test.USTAB') == 0; % Get the stability
 
