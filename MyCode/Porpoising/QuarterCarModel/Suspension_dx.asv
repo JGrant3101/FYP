@@ -1,6 +1,5 @@
-%% Defining the suspension system of the car, this also includes the tyre stiffness.
-function rhs = Suspension(x, p)
-
+%% Defining the Jacobian for the suspension system of the car w.r.t the x vector.
+function J = Suspension_dx(x, p)
 % Firstly define the variable terms
 % Sprung mass vertical displacement
 Zs = x(1, :);
@@ -10,6 +9,7 @@ Zu = x(2, :);
 Phis = x(3, :);
 % Unsprung mass vertical velocity
 Phiu = x(4, :);
+
 
 % Then defining the constant terms
 % Sprung mass
@@ -35,22 +35,20 @@ lamda = p(10, :);
 % Scaling for Inverse Gaussian distribution
 scaling = p(11, :);
 
-% Calculating downforce from upper aero elements
-DWFUpper = A.* vCar.^2;
 % Calculating ride height, this is the static ride height plus the vertical
 % displacements of both the sprung and unsprung mass.
-h = H + Zs + Zu;
-% Calculating the downforce from the floor
-DWFFloorValue = DWFFloor(h, mew, lamda, scaling);
+h = H + x(1, :) + x(2, :);
 
-% Running calculations for vertical displacement first and second derivatives in
-% time.
-rhs = zeros(size(x));
-rhs(1, :) = Phis;
-rhs(2, :) = Phiu;
-rhs(3, :) = -(Ks./Ms) .* Zs + (Ks./Ms) .* Zu - (Cs./Ms) .* Phis + (Cs./Ms) .* Phiu - (DWFUpper + DWFFloorValue)./Ms;
-rhs(4, :) = (Ks./Mu) .* Zs - ((Ks./Mu) + (Kt./Mu)) .* Zu + (Cs./Mu) .* Phis - (Cs./Mu) .* Phiu;
+% Initialising our Jacobian
+J = zeros(4, 4, numel(Zs));
 
+% Populating the non-zero terms with values
+J(1, 3, :) = 1;
+
+J(2, 4, :) = 1;
+
+J(3, 1, :) = -(Ks./Ms) - ((scaling .* sqrt(lamda)) ./ (Ms .* sqrt(2 .* pi))) .* ((lamda .* (h - mew) .* ((h - mew) - 2 .* h) - 2 .* mew.^2) ./ 2 .* mew.^2 .* h.^2) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h));
+J(3, 2, :) = (Ks./Ms) - ((scaling .* sqrt(lamda)) ./ (Ms .* sqrt(2 .* pi))) .* ((lamda .* (h - mew) .* ((h - mew) - 2 .* h) - 2 .* mew.^2) ./ 2 .* mew.^2 .* h.^2) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h));
+J(3, 3, :) = -Cs ./ Ms;
+J(3, 4, :) = ;
 end
-
-

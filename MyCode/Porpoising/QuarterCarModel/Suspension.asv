@@ -1,14 +1,12 @@
 %% Defining the suspension system of the car, this also includes the tyre stiffness.
 function rhs = Suspension(x, p)
-
 % Firstly define the variable terms
 % Sprung mass vertical displacement
 Zs = x(1, :);
 % Unsprung mass vertical displacement
 Zu = x(2, :);
-% Sprung mass vertical velocity
+% Sprung mass vertical velocit
 Phis = x(3, :);
-% Unsprung mass vertical velocity
 Phiu = x(4, :);
 
 % Then defining the constant terms
@@ -48,7 +46,7 @@ DWFFloorValue = DWFFloor(h, mew, lamda, scaling);
 rhs = zeros(size(x));
 rhs(1, :) = Phis;
 rhs(2, :) = Phiu;
-rhs(3, :) = -(Ks./Ms) .* Zs + (Ks./Ms) .* Zu - (Cs./Ms) .* Phis + (Cs./Ms) .* Phiu - (DWFUpper + DWFFloorValue)./Ms;
+rhs(3, :) = -(Ks./Ms) .* Zs + (Ks./Ms) .* Zu - (Cs./Ms) .* Phis + (Cs./Ms) .* Phiu - (DWFUpper + DWFFloorValue)./Ms; % This also has the variable downforce component dependent on Vcar and ride height which will be added
 rhs(4, :) = (Ks./Mu) .* Zs - ((Ks./Mu) + (Kt./Mu)) .* Zu + (Cs./Mu) .* Phis - (Cs./Mu) .* Phiu;
 
 end
