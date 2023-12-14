@@ -17,7 +17,7 @@ Inputs(5, 1) = 2.7 * 10^5;
 % Static ride height (m)
 Inputs(6, 1) = 0.1;
 % vCar (kph)
-Inputs(7, 1) = 200;
+Inputs(7, 1) = 250;
 % Upper downforce elements multiplier
 Inputs(8, 1) = 0.365;
 % Mean for Inverse Gaussian distribution
@@ -37,17 +37,41 @@ pnames = {'Ms' 'Mu' 'Ks' 'Cs' 'Kt' 'H' 'vCar' 'A' 'mew' 'lamda' 'scaling'};
 prob = coco_prob();
 
 % Defining the functions
-funcs = {@Suspension, @Suspension_dx, @Suspension_dp};
+SystemSetup = {@Suspension}; %, @Suspension_dx, @Suspension_dp};
 
 % Defining the function arguments
-args = {funcs{:}, x0, pnames, Inputs};
+args = {SystemSetup{:}, x0, pnames, Inputs};
+
+% Change the maximum step size
+prob = coco_set(prob, 'cont', 'h_max', 1);
+
+prob = coco_set(prob, 'cont', 'h_min', 1e-10);
+
+% Increase the number of continuation steps
+prob = coco_set(prob, 'cont', 'PtMX', 300);
+% Increase the number of Iterations
+%prob = coco_set(prob, 'cont', 'ItMX', 50);
 
 % Defining the arguments we want COCO to vary and in what range we want
 % them varied
-variableargs = {2, {'Cs', 'vCar'}, [2000 5000; 100 340]};
+% variableargs = {2, {'Cs', 'vCar'}, {[2000 5000], [100 340]}};
+variableargs = {1, 'vCar', [100 340]};
+
+bd0 = coco(prob, 'Intitial', @ode_isol2ep, args{:}, variableargs{:});
+
+bd = coco_bd_read('Intitial');
+
+labs = coco_bd_labs(bd, 'HB');
+
+prob1 = coco_prob();
+
+prob1 = coco_set(prob1, 'cont1', 'PtMX', 50);
+
+prob1 = ode_HB2HB(prob, '', 'Intitial', labs(2));
 
 % Running COCO
 bd1 = coco(prob, 'Test1', @ode_isol2ep, args{:}, variableargs{:});
+
 
 %bd1 = coco(prob, 'car', 'ode', 'isol', 'ep', ...
  % @(u,p)Suspension(u,p), [], [], u0, {'al' 'be' 'de' 'ro'}, Inputs,  ...               % ep toolbox arguments
