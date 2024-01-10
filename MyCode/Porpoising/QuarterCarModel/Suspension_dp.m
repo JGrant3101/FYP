@@ -43,11 +43,11 @@ J = zeros(4, 11, numel(Zs));
 
 % Populating the non-zero terms with values
 J(3, 1, :) = (1 ./ Ms.^2) .* (Ks .* Zs - Ks .* Zu + Cs .* Phis - Cs .* Phiu + ...
-    ((scaling .* sqrt(lamda)) ./ sqrt(2 * pi) .* h) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h)) + A .* vCar.^2);
+    ((scaling .* sqrt(lamda)) ./ (sqrt(2 * pi) .* h)) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h)) + A .* vCar.^2);
 J(3, 3, :) = -(Zs ./ Ms) + (Zu ./ Ms);
 J(3, 4, :) = -(Phis ./ Ms) + (Phiu ./ Ms);
-J(3, 6, :) = -((scaling .* sqrt(lamda)) ./ (sqrt(2 * pi) .* Ms)) .* ((lamda .* (h - mew) .* ... 
-    ((h - mew) - 2 * h) - 2 * mew.^2) ./ (2 .* mew.^2 .* h.^2)) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h));
+J(3, 6, :) =  - ((scaling .* sqrt(lamda)) ./ (Ms .* h.^2 .* sqrt(2 .* pi))) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h)) .* ...
+    (((lamda .* (mew.^2 - h.^2))./(2 .* mew.^2 .* h)) - 1);
 J(3, 7, :) = (-2 * A .* vCar) ./ Ms;
 J(3, 8, :) = (-vCar.^2) ./ Ms;
 J(3, 9, :) = ((-scaling .* lamda.^(3/2) .* (h - mew)) ./ (Ms .* h .* mew.^3 .* sqrt(2 * pi))) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h));

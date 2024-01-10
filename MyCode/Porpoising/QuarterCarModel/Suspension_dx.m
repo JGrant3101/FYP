@@ -47,10 +47,10 @@ J(1, 3, :) = 1;
 
 J(2, 4, :) = 1;
 
-J(3, 1, :) = -(Ks./Ms) - ((scaling .* sqrt(lamda)) ./ (Ms .* sqrt(2 .* pi))) .* ((lamda .* (h - mew) .* ...
-    ((h - mew) - 2 .* h) - 2 .* mew.^2) ./ 2 .* mew.^2 .* h.^2) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h));
-J(3, 2, :) = (Ks./Ms) - ((scaling .* sqrt(lamda)) ./ (Ms .* sqrt(2 .* pi))) .* ...
-    ((lamda .* (h - mew) .* ((h - mew) - 2 .* h) - 2 .* mew.^2) ./ 2 .* mew.^2 .* h.^2) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h));
+J(3, 1, :) = -(Ks./Ms) - ((scaling .* sqrt(lamda)) ./ (Ms .* h.^2 .* sqrt(2 .* pi))) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h)) .* ...
+    (((lamda .* (mew.^2 - h.^2))./(2 .* mew.^2 .* h)) - 1);
+J(3, 2, :) = (Ks./Ms) - ((scaling .* sqrt(lamda)) ./ (Ms .* h.^2 .* sqrt(2 .* pi))) .* exp(-(lamda.*(h-mew).^2)./(2.*mew.^2.*h)) .* ...
+    (((lamda .* (mew.^2 - h.^2))./(2 .* mew.^2 .* h)) - 1);
 J(3, 3, :) = -Cs ./ Ms;
 J(3, 4, :) = Cs ./ Ms;
 

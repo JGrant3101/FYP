@@ -25,9 +25,9 @@ Inputs(9, 1) = 0.033;
 % Shape factor for Inverse Gaussian distribution
 Inputs(10, 1) = 0.07;
 % Scaling applied to Inverse Gaussian distribution
-Inputs(11, 1) = 0.1*(500/9)^2;
+Inputs(11, 1) = 0.31*(500/9)^2;
 
-% Defining out initial x array
+% Defining our initial x array
 x0 = [-31.1e-3;-8.4e-3;0;0];
 
 % Defining the names of the inputs already written above
@@ -35,9 +35,10 @@ pnames = {'Ms' 'Mu' 'Ks' 'Cs' 'Kt' 'H' 'vCar' 'A' 'mew' 'lamda' 'scaling'};
 
 % Initialising the COCO problem
 prob = coco_prob();
+prob = coco_set(prob, 'ep', 'NSA', true);
 
 % Defining the functions
-SystemSetup = {@Suspension}; %, @Suspension_dx, @Suspension_dp};
+SystemSetup = {@Suspension, @Suspension_dx, @Suspension_dp};
 
 % Defining the function arguments
 args = {SystemSetup{:}, x0, pnames, Inputs};
