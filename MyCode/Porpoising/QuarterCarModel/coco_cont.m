@@ -17,7 +17,7 @@ Inputs(5, 1) = 2.7 * 10^5;
 % Static ride height (m)
 Inputs(6, 1) = 0.1;
 % vCar (kph)
-Inputs(7, 1) = 250;
+Inputs(7, 1) = 300;
 % Upper downforce elements multiplier
 Inputs(8, 1) = 0.365;
 % Mean for Inverse Gaussian distribution
@@ -44,21 +44,40 @@ SystemSetup = {@Suspension, @Suspension_dx, @Suspension_dp};
 args = {SystemSetup{:}, x0, pnames, Inputs};
 
 % Change the maximum step size
-prob = coco_set(prob, 'cont', 'h_max', 1);
+prob = coco_set(prob, 'cont', 'h_max', 3);
 
 prob = coco_set(prob, 'cont', 'h_min', 1e-10);
 
 % Increase the number of continuation steps
-prob = coco_set(prob, 'cont', 'PtMX', 300);
+prob = coco_set(prob, 'cont', 'PtMX', 600);
 % Increase the number of Iterations
 %prob = coco_set(prob, 'cont', 'ItMX', 50);
 
 % Defining the arguments we want COCO to vary and in what range we want
 % them varied
 % variableargs = {2, {'Cs', 'vCar'}, {[2000 5000], [100 340]}};
-variableargs = {1, 'vCar', [100 340]};
+% variableargs = {1, 'Ks', [2*10^5 3*10^5]};
+% variableargs = {1, 'Ms', [50 250]};
+% 
+% bd0 = coco(prob, 'Intitial', @ode_isol2ep, args{:}, variableargs{:});
+% 
+% 
+% bdread0 = coco_bd_read('Intitial'); % Get the Omega parameter
+% IndependentVar_val = cell2mat([bdread0(2:end,14)])' ;
+% x_val = cell2mat([bdread0(2:end,28)]') ;
+% figure ; plot(IndependentVar_val, x_val(1:2,:)) ;
+% hep = Inputs(6, 1) + x_val(1,:) + x_val(2,:);
+% hold on
+% plot(IndependentVar_val, hep)
+% xlabel('vCar (kph)')
+% ylabel('Equilibrium values (m)')
+% legend('Zs (m)', 'Zu (ms)', 'Ride height (m)')
 
-bd0 = coco(prob, 'Intitial', @ode_isol2ep, args{:}, variableargs{:});
+bdread0 = varyingparameters('scaling', [400 1600], prob, args, Inputs);
+
+return
+
+
 
 bd = coco_bd_read('Intitial');
 
@@ -80,6 +99,24 @@ bd1 = coco(prob, 'Test1', @ode_isol2ep, args{:}, variableargs{:});
 
 
 
+%% Section for functions
+function bdread0 = varyingparameters(param2vary, range, prob, args, Inputs)
+    variableargs = {1, param2vary, range};
 
+    bd0 = coco(prob, 'Intitial', @ode_isol2ep, args{:}, variableargs{:});
+    
+    
+    bdread0 = coco_bd_read('Intitial'); % Get the Omega parameter
+    [~,column] = find(strcmp(bdread0,param2vary));
+    IndependentVar_val = cell2mat([bdread0(2:end,column)])' ;
 
+    x_val = cell2mat([bdread0(2:end,28)]') ;
+    figure ; plot(IndependentVar_val, x_val(1:2,:)) ;
+    hep = Inputs(6, 1) + x_val(1,:) + x_val(2,:);
+    hold on
+    plot(IndependentVar_val, hep)
+    xlabel(param2vary)
+    ylabel('Equilibrium values (m)')
+    legend('Zs (m)', 'Zu (ms)', 'Ride height (m)')
+end
 
