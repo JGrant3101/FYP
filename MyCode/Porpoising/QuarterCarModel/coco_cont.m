@@ -46,7 +46,7 @@ SystemSetup = {@Suspension, @Suspension_dx, @Suspension_dp};
 args = {SystemSetup{:}, x0, pnames, Inputs};
 
 % Change the maximum step size
-prob = coco_set(prob, 'cont', 'h_max', 3);
+prob = coco_set(prob, 'cont', 'h_max', 200);
 
 prob = coco_set(prob, 'cont', 'h_min', 1e-10);
 
@@ -58,28 +58,40 @@ prob = coco_set(prob, 'cont', 'PtMX', 600);
 %% Varying single parameter to find HB points
 
 % Calling function to vary a parameter and run a continuation
-bdread0 = varyingparameters('scaling', [400 1600], prob, args, Inputs);
+bdread0 = varyingparameters('Kt', [100000 400000], prob, args, Inputs);
 
 %% Further inspection of these HB points
 
-bd = coco_bd_read('Intitial');
+labs = coco_bd_labs(bdread0, 'HB');
 
-labs = coco_bd_labs(bd, 'HB');
+HBbd = cell(1, length(labs));
 
-prob1 = coco_prob();
+for i = 1:length(labs)
+    
+    % Creating an empty COCO problem structure
+    prob1 = coco_prob();
+    % Defining the settings of the problem structure
+    prob1 = coco_set(prob1, 'ep', 'NSA', true);
+    prob1 = coco_set(prob1, 'cont', 'h_max', 800);
+    prob1 = coco_set(prob1, 'cont', 'h_min', 1e-10);
+    prob1 = coco_set(prob1, 'cont', 'PtMX', 600);
+    prob1 = coco_set(prob1, 'cont', 'ItMX', 500);
+    prob1 = coco_set(prob1, 'cont', 'NAdapt', 4); 
 
-prob1 = coco_set(prob1, 'cont1', 'PtMX', 50);
+    % Restarting the continuation along a family of Hopf Bifurcations
+    prob1 = ode_HB2HB(prob1, '', 'Initial', labs(i));
 
-prob1 = ode_HB2HB(prob, '', 'Intitial', labs(2));
+    % Running COCO
+    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {'Kt', 'Ks'}, {[100000 400000], [33000 220000]});
 
-% Running COCO
-bd1 = coco(prob, 'Test1', @ode_isol2ep, args{:}, variableargs{:});
+    figure(i+1); clf; hold on
+    thm1 = struct('special', {{'HB', 'EP'}});
+    thm2 = struct('sepcial', {{'EP'}});
+    coco_plot_bd(thm1, 'Initial', 'Kt', 'Ks', '||x||_2')
+    coco_plot_bd(thm2, sprintf('Test%d', i), 'Kt', 'Ks', '||x||_2')
+    hold off; grid on; view(3)
 
-
-%bd1 = coco(prob, 'car', 'ode', 'isol', 'ep', ...
- % @(u,p)Suspension(u,p), [], [], u0, {'al' 'be' 'de' 'ro'}, Inputs,  ...               % ep toolbox arguments
-  %1, {'be' 'ep.test.SN' 'ep.test.HB' 'ep.test.USTAB' 'atlas.test.FP'}, [2 7]); % cont toolbox arguments
-
+end
 
 
 %% Section for functions
