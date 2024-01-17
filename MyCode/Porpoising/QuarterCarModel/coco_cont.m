@@ -2,6 +2,8 @@ clear all
 close all
 clc
 
+%% Initialising inputs
+
 % Setting up the constant input terms for the suspension function
 Inputs = [];
 % Sprung mass (kg)
@@ -53,31 +55,12 @@ prob = coco_set(prob, 'cont', 'PtMX', 600);
 % Increase the number of Iterations
 %prob = coco_set(prob, 'cont', 'ItMX', 50);
 
-% Defining the arguments we want COCO to vary and in what range we want
-% them varied
-% variableargs = {2, {'Cs', 'vCar'}, {[2000 5000], [100 340]}};
-% variableargs = {1, 'Ks', [2*10^5 3*10^5]};
-% variableargs = {1, 'Ms', [50 250]};
-% 
-% bd0 = coco(prob, 'Intitial', @ode_isol2ep, args{:}, variableargs{:});
-% 
-% 
-% bdread0 = coco_bd_read('Intitial'); % Get the Omega parameter
-% IndependentVar_val = cell2mat([bdread0(2:end,14)])' ;
-% x_val = cell2mat([bdread0(2:end,28)]') ;
-% figure ; plot(IndependentVar_val, x_val(1:2,:)) ;
-% hep = Inputs(6, 1) + x_val(1,:) + x_val(2,:);
-% hold on
-% plot(IndependentVar_val, hep)
-% xlabel('vCar (kph)')
-% ylabel('Equilibrium values (m)')
-% legend('Zs (m)', 'Zu (ms)', 'Ride height (m)')
+%% Varying single parameter to find HB points
 
+% Calling function to vary a parameter and run a continuation
 bdread0 = varyingparameters('scaling', [400 1600], prob, args, Inputs);
 
-return
-
-
+%% Further inspection of these HB points
 
 bd = coco_bd_read('Intitial');
 
@@ -103,10 +86,10 @@ bd1 = coco(prob, 'Test1', @ode_isol2ep, args{:}, variableargs{:});
 function bdread0 = varyingparameters(param2vary, range, prob, args, Inputs)
     variableargs = {1, param2vary, range};
 
-    bd0 = coco(prob, 'Intitial', @ode_isol2ep, args{:}, variableargs{:});
+    bd0 = coco(prob, 'Initial', @ode_isol2ep, args{:}, variableargs{:});
     
     
-    bdread0 = coco_bd_read('Intitial'); % Get the Omega parameter
+    bdread0 = coco_bd_read('Initial'); % Get the Omega parameter
     [~,column] = find(strcmp(bdread0,param2vary));
     IndependentVar_val = cell2mat([bdread0(2:end,column)])' ;
 
