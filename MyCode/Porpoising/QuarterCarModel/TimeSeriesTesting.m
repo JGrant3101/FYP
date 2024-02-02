@@ -20,7 +20,7 @@ Inputs(5, 1) = 2.7 * 10^5;
 % Static ride height (m)
 Inputs(6, 1) = 0.1;
 % vCar (kph)
-Inputs(7, 1) = 300;
+Inputs(7, 1) = 208;
 % Upper downforce elements multiplier
 Inputs(8, 1) = 0.365;
 % Mean for Inverse Gaussian distribution
@@ -33,8 +33,8 @@ Inputs(11, 1) = 0.31*(500/9)^2;
 
 sol = ode45(@(t, x)SuspensionWithTime(t, x, Inputs), [0, 64], [-0.031; -0.008; 0; 0; 0; 0], odeset('RelTol', 1e-8)); % Simulate 
 DWFFloorResults = DWFFloor((Inputs(6, 1) + sol.y(1, :) + sol.y(2, :))', Inputs(9, 1), Inputs(10, 1), Inputs(11, 1))';
-tiledlayout(1, 4); nexttile; plot(sol.x, sol.y(1, :)); nexttile; plot(sol.x, sol.y(2, :)); ...
-    nexttile; plot(sol.x, Inputs(6, 1) + sol.y(1, :) + sol.y(2, :)); nexttile; plot(sol.x, DWFFloorResults)
+tiledlayout(1, 3); nexttile; plot(sol.x, sol.y(1, :)); nexttile; plot(sol.x, sol.y(2, :)); ...
+    nexttile; plot(sol.x, Inputs(6, 1) + sol.y(1, :) + sol.y(2, :));% nexttile; plot(sol.x, DWFFloorResults)
 
 return
 % Now that all inputs have been set up can run the function in a for loop
