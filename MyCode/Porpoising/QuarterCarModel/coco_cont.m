@@ -91,7 +91,7 @@ for i = 1:length(labs)
     HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[0.001 0.07], [400 1600]});
     
     prob2 = coco_prob();
-    prob2 = coco_set(prob2, 'coll', 'NTST', 20);
+    prob2 = coco_set(prob2, 'coll', 'NTST', 200);
     prob2 = coco_set(prob2, 'po', 'bifus', true);
     prob2 = ode_HB2po(prob2, '', 'Initial', labs(i));
     prob2 = coco_set(prob2, 'cont', 'PtMX', 1500);
