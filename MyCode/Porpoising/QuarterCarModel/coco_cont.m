@@ -46,7 +46,7 @@ SystemSetup = {@Suspension, @Suspension_dx, @Suspension_dp};
 args = {SystemSetup{:}, x0, pnames, Inputs};
 
 % Change the maximum step size
-prob = coco_set(prob, 'cont', 'h_max', 0.001);
+prob = coco_set(prob, 'cont', 'h_max', 800);
 
 prob = coco_set(prob, 'cont', 'h_min', 1e-10);
 
@@ -58,9 +58,9 @@ prob = coco_set(prob, 'cont', 'PtMX', 500);
 %% Varying single parameter to find HB points
 
 % Calling function to vary a parameter and run a continuation
-param = 'mew';
-Index = 9;
-bdread0 = varyingparameters(param, [0.001 0.07], prob, args, Inputs);
+param = 'Kt';
+Index = 5;
+bdread0 = varyingparameters(param, [70000 500000], prob, args, Inputs);
 
 %% Further inspection of these HB points
 
@@ -70,13 +70,13 @@ HBbd = cell(1, length(labs));
 Po = cell(1, length(labs));
 
 for i = 1:length(labs)
-    param4HB = 'scaling';
-    Index4HB = 11;
+    param4HB = 'H';
+    Index4HB = 6;
     % Creating an empty COCO problem structure
     prob1 = coco_prob();
     % Defining the settings of the problem structure
     prob1 = coco_set(prob1, 'ep', 'NSA', true);
-    prob1 = coco_set(prob1, 'cont', 'h_max', 2);
+    prob1 = coco_set(prob1, 'cont', 'h_max', 800);
     prob1 = coco_set(prob1, 'cont', 'h_min', 1e-10);
     prob1 = coco_set(prob1, 'cont', 'PtMX', 700);
     prob1 = coco_set(prob1, 'cont', 'ItMX', 500);
@@ -88,7 +88,7 @@ for i = 1:length(labs)
    % prob1 = coco_add_slot(prob1, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
 
     % Running COCO
-    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[0.001 0.07], [400 1600]});
+    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[70000 500000], [0.01 0.15]});
     
     prob2 = coco_prob();
     prob2 = coco_set(prob2, 'coll', 'NTST', 200);
@@ -97,12 +97,12 @@ for i = 1:length(labs)
     prob2 = coco_set(prob2, 'cont', 'PtMX', 1500);
     prob2 = coco_set(prob2, 'cont', 'ItMX', 500);
     prob2 = coco_set(prob2, 'cont', 'h_min', 1e-10);
-    prob2 = coco_set(prob2, 'cont', 'NAdapt', 1, 'h_max', 0.01);
+    prob2 = coco_set(prob2, 'cont', 'NAdapt', 1, 'h_max', 500);
 
     % Tell COCO to store extra information about the periodic orbits
     prob2 = coco_add_slot(prob2, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
 
-    Po{i} = coco(prob2, sprintf('po_run%d', i), [], 1, {param 'po.period'}, [0.019 0.07]);
+    Po{i} = coco(prob2, sprintf('po_run%d', i), [], 1, {param 'po.period'}, [150000 500000]);
 
     figure(i+1); clf; hold on
     thm1 = struct('special', {{'HB', 'EP'}});
@@ -135,9 +135,9 @@ for i = 1:length(labs)
     stabpo = coco_bd_col(bd2, 'po.test.USTAB') == 0; % Get the stability
 
     plot(parampo(stabpo), x_max(1,stabpo),'.k') ;
-    plot(parampo(~stabpo), x_max(1,~stabpo),'.o') ;
+    plot(parampo(~stabpo), x_max(1,~stabpo),'.m') ;
     plot(parampo(stabpo), x_min(1,stabpo),'.k') ;
-    plot(parampo(~stabpo), x_min(1,~stabpo),'.o') ;
+    plot(parampo(~stabpo), x_min(1,~stabpo),'.m') ;
     if any(~stabpo)
         legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
     else 
@@ -151,9 +151,9 @@ for i = 1:length(labs)
 
     % Plot PO results for Zu
     plot(parampo(stabpo), x_max(2,stabpo),'.k') ;
-    plot(parampo(~stabpo), x_max(2,~stabpo),'.o') ;
+    plot(parampo(~stabpo), x_max(2,~stabpo),'.m') ;
     plot(parampo(stabpo), x_min(2,stabpo),'.k') ;
-    plot(parampo(~stabpo), x_min(2,~stabpo),'.o') ;
+    plot(parampo(~stabpo), x_min(2,~stabpo),'.m') ;
     if any(~stabpo)
         legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
     else 

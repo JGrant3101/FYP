@@ -1,0 +1,86 @@
+MATLAB version 23.2.0.2380103 (R2023b) Update 1 on architecture win64
+
+run: { runid='po_run1' toolbox='empty' tbxctor=@empty_ctor isol_type='' sol_type='' dir='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\QuarterCarModel\data\po_run1' bdfname='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\QuarterCarModel\data\po_run1\bd.mat' logname='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\QuarterCarModel\data\po_run1\coco_log.txt' scrname='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\QuarterCarModel\data\po_run1\coco_scr.txt' }
+
+all: { TOL=1e-06 CleanData=false LogLevel=1 data_dir='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\QuarterCarModel\data' }
+  +-coll: { NTST=200 }
+  +-po: { bifus=true }
+  | +-orb
+  |   +-coll: { var=true }
+  +-cont: { PtMX=1500 ItMX=500 h_min=1e-10 NAdapt=1 h_max=500 }
+  +-lsol: { det=true }
+
+funcs
+  +-po: { type='zero' }
+  | +-orb
+  | | +-coll: { type='zero' }
+  | |   +-T0: { type='inactive' pars={ 'po.orb.coll.T0' } }
+  | |   +-pars: { type='inactive' pars={ 'Ms' 'Mu' 'Ks' 'Cs' 'Kt' 'H' 'vCar' 'A' 'mew' 'lamda' 'scaling' } }
+  | |   +-err: { type='regular' pars={ 'po.orb.coll.err' 'po.orb.coll.err_TF' } }
+  | |   +-test: { type='regular' }
+  | +-period: { type='active' pars={ 'po.period' } }
+  | +-test: { type='regular' pars={ 'po.test.SN' 'po.test.PD' 'po.test.NS' 'po.test.USTAB' } }
+  +-cseg
+  | +-prcond: { type='zero' }
+  +-atlas
+    +-test
+      +-BP: { type='singular' pars={ 'atlas.test.BP' } }
+      +-FP: { type='singular' pars={ 'atlas.test.FP' } }
+
+slots
+  +-po: { signals={ 'bddat@bddat' 'save_full@coco_save_data' 'update@update' } }
+  | +-orb
+  | | +-coll: { signals={ 'bddat@bddat' 'save_full@coco_save_data' } }
+  | | | +-test: { signal='update@var_update' }
+  | | +-tb_info: { signals={ 'save_bd@coco_save_data' 'save_reduced@coco_save_data' } }
+  | +-test: { signal='bddat@bddat' }
+  +-slot_bd_min_max: { signal='bddat@slot_bd_min_max' }
+  +-cseg
+  | +-fix_mfunc: { signal='fix_mfunc@CurveSegmentBase.fix_mfunc' }
+  | +-remesh: { signal='remesh@CurveSegmentBase.remesh' }
+  | +-set_mode: { signal='set_mode@CurveSegmentBase.set_mode' }
+  | +-update: { signal='update@CurveSegmentBase.update' }
+  | +-update_h: { signal='update_h@CurveSegmentBase.update_h' }
+  | +-update_w: { signal='update_w@CurveSegmentBase.update_w' }
+  +-tb_info: { signals={ 'save_bd@coco_save_data' 'save_reduced@coco_save_data' } }
+  +-run: { signal='save_bd@save_run' }
+  +-bd: { signal='save_bd@save_bd' }
+  +-bddat: { signal='save_bd@save_bddat' }
+  +-lsol
+    +-det: { signal='set_mode@set_save_det' }
+
+signals
+  +-save_bd: { owner='coco' slots={ 'po.orb.tb_info@coco_save_data' 'tb_info@coco_save_data' 'run@save_run' 'bd@save_bd' 'bddat@save_bddat' } }
+  +-update: { owner='CurveSegmentBase' slots={ 'po.orb.coll.test@var_update' 'po@update' 'cseg.update@CurveSegmentBase.update' } }
+  +-set_mode: { owner='CurveSegmentBase' slots={ 'cseg.set_mode@CurveSegmentBase.set_mode' 'lsol.det@set_save_det' } }
+  +-update_h: { owner='CurveSegmentBase' slots={ 'cseg.update_h@CurveSegmentBase.update_h' } }
+  +-fix_mfunc: { owner='CurveSegmentBase' slots={ 'cseg.fix_mfunc@CurveSegmentBase.fix_mfunc' } }
+  +-remesh: { owner='atlas_1d' slots={ 'cseg.remesh@CurveSegmentBase.remesh' } }
+  +-bddat: { owner='AtlasBase' slots={ 'po.orb.coll@bddat' 'po.test@bddat' 'po@bddat' 'slot_bd_min_max@slot_bd_min_max' } }
+  +-save_full: { owner='AtlasBase' slots={ 'po.orb.coll@coco_save_data' 'po@coco_save_data' } }
+  +-save_reduced: { owner='AtlasBase' slots={ 'po.orb.tb_info@coco_save_data' 'tb_info@coco_save_data' } }
+
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          6.19e-06  1.48e+05    0.0    0.0    0.0
+   1   1  1.00e+00  1.44e-02  1.12e-06  1.48e+05    0.0    0.0    0.0
+   2   3  2.50e-01  2.37e-02  1.03e-06  1.48e+05    0.0    0.0    0.0
+   3   1  1.00e+00  3.55e-03  6.83e-08  1.48e+05    0.0    0.0    0.1
+   4   1  1.00e+00  4.43e-03  1.06e-07  1.48e+05    0.0    0.1    0.1
+   5   1  1.00e+00  1.38e-03  1.04e-08  1.48e+05    0.0    0.1    0.1
+   6   1  1.00e+00  2.16e-04  2.52e-10  1.48e+05    0.0    0.1    0.1
+   7   1  1.00e+00  3.54e-06  6.83e-14  1.48e+05    0.0    0.1    0.1
+   8   1  1.00e+00  3.54e-06  7.88e-15  1.48e+05    0.0    0.1    0.1
+   9   1  1.00e+00  7.74e-06  1.46e-15  1.48e+05    0.0    0.1    0.2
+  10   1  1.00e+00  2.26e-06  4.59e-15  1.48e+05    0.0    0.1    0.2
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE            Kt    po.period
+   -1    0.00e+00  00:00:00   1.4799e+05      1  MX             ---          ---
+
+POINT -1: computation finished
+*********************************************************************
