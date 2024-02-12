@@ -6,9 +6,9 @@ format long
 t = [0:0.1:100]';
 % Our Inputs struct is already set up but want to use a value for a
 % parameter that, according to COCO, will result in oscillations
-paramtest = 'mew';
+paramtest = 'Kt';
 % Define an array of test values
-paramtestvalues = linspace(0.021, 0.027, 41);
+paramtestvalues = linspace(150000, 210000, 61);
 N = length(paramtestvalues);
 
 % Defining arrays of 0s to add values to
@@ -26,7 +26,7 @@ COCOrideheightAmplitudes = zeros(N, 1);
 
 COCOFreqs = zeros(N, 1);
 for i = 1:N
-    Inputs(9, 1) = paramtestvalues(i);
+    Inputs(5, 1) = paramtestvalues(i);
     % Time based test
     maxtime = 10;
     % Run the simulation and plot the results
@@ -201,7 +201,7 @@ for i = 1:N
     % Now want to extract the period from our COCO data in order to get the
     % frequency of the oscillations at this point according to COCO, this will
     % just be one value
-    TimePeriods = Po{1, 1}(2:end, find(strcmp(Po{1, 1}(1, :), 'po.period')));
+    TimePeriods = Po{1, 2}(2:end, find(strcmp(Po{1, 1}(1, :), 'po.period')));
     TimePeriods = cell2mat(TimePeriods);
     TimePeriods_unique = TimePeriods(ia);
     TimePeriod = interp1(parampounique, TimePeriods_unique, paramtestvalues(i));
