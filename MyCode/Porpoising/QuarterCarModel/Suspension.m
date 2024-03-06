@@ -41,7 +41,7 @@ DWFUpper = A.* vCar.^2;
 % displacements of both the sprung and unsprung mass.
 h = H + Zs + Zu;
 % Calculating the downforce from the floor
-DWFFloorValue = DWFFloor(h, mew, lamda, scaling);
+DWFFloorValue = DWFFloorNew(h, mew, lamda, scaling);
 
 % Running calculations for vertical displacement first and second derivatives in
 % time.

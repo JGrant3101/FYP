@@ -11,26 +11,28 @@ Inputs(1, 1) = 180;
 % Unsprung mass (kg)
 Inputs(2, 1) = 50;
 % Suspension stiffness (N/m)
-Inputs(3, 1) = 10^5;
+Inputs(3, 1) = 0.9*10^5;
 % Suspension damping (Ns/m)
 Inputs(4, 1) = 3400;
 % Tyre vertical stiffness (N/m)
-Inputs(5, 1) = 2.7 * 10^5;
+Inputs(5, 1) = 0.9*2.7 * 10^5;
 % Static ride height (m)
 Inputs(6, 1) = 0.1;
 % vCar (kph)
-Inputs(7, 1) = 300;
+Inputs(7, 1) = 280;
 % Upper downforce elements multiplier
 Inputs(8, 1) = 0.365;
 % Mean for Inverse Gaussian distribution
-Inputs(9, 1) = 0.033;
+Inputs(9, 1) = 0.0001;
 % Shape factor for Inverse Gaussian distribution
-Inputs(10, 1) = 0.07;
+Inputs(10, 1) = 2.4;
 % Scaling applied to Inverse Gaussian distribution
 Inputs(11, 1) = 0.31*(500/9)^2;
 
 % Defining our initial x array
-x0 = [-31.1e-3;-8.4e-3;0;0];
+% x0 = [-31.1e-3;-8.4e-3;0;0];
+x0 = [-0.0371;-0.01;0;0];
+% x0 = [0;0;0;0];
 
 % Defining the names of the inputs already written above
 pnames = {'Ms' 'Mu' 'Ks' 'Cs' 'Kt' 'H' 'vCar' 'A' 'mew' 'lamda' 'scaling'};
@@ -40,7 +42,7 @@ prob = coco_prob();
 prob = coco_set(prob, 'ep', 'NSA', true);
 
 % Defining the functions
-SystemSetup = {@Suspension, @Suspension_dx, @Suspension_dp};
+SystemSetup = {@Suspension}; %, @Suspension_dx, @Suspension_dp};
 
 % Defining the function arguments
 args = {SystemSetup{:}, x0, pnames, Inputs};
@@ -54,6 +56,11 @@ prob = coco_set(prob, 'cont', 'h_min', 1e-10);
 prob = coco_set(prob, 'cont', 'PtMX', 500);
 % Increase the number of Iterations
 %prob = coco_set(prob, 'cont', 'ItMX', 50);
+
+% Adding the lyapunov function 
+% [data, uidx] = coco_get_func_data(prob, 'ep', 'data', 'uidx');
+% 
+% prob = coco_add_func(prob, 'lyap', @lyapunov, data.ep_eqn, 'regular', 'L1', 'uidx', uidx);
 
 %% Varying single parameter to find HB points
 
@@ -70,40 +77,35 @@ HBbd = cell(1, length(labs));
 Po = cell(1, length(labs));
 
 for i = 1:length(labs)
-    param4HB = 'scaling';
-    Index4HB = 11;
+    param4HB = 'Ks';
+    Index4HB = 3;
     % Creating an empty COCO problem structure
     prob1 = coco_prob();
     % Defining the settings of the problem structure
     prob1 = coco_set(prob1, 'ep', 'NSA', true);
-    prob1 = coco_set(prob1, 'cont', 'h_max', 2);
+    prob1 = coco_set(prob1, 'cont', 'h_max', 1000);
     prob1 = coco_set(prob1, 'cont', 'h_min', 1e-10);
-    prob1 = coco_set(prob1, 'cont', 'PtMX', 700);
+    prob1 = coco_set(prob1, 'cont', 'PtMX', 2000);
     prob1 = coco_set(prob1, 'cont', 'ItMX', 500);
-    prob1 = coco_set(prob1, 'cont', 'NAdapt', 4); 
+    prob1 = coco_set(prob1, 'cont', 'NAdapt', 1); 
 
     % Restarting the continuation along a family of Hopf Bifurcations
     prob1 = ode_HB2HB(prob1, '', 'Initial', labs(i));
 
-   % prob1 = coco_add_slot(prob1, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
+    % Adding the lyapunov function 
+    [data1, uidx1] = coco_get_func_data(prob1, 'ep', 'data', 'uidx');
+    
+    prob1 = coco_add_func(prob1, 'lyap', @lyapunov, data1.ep_eqn, 'regular', 'L1', 'uidx', uidx1);
+
+    % Adding an event to check where the lyapunov coefficient is 0
+    prob1 = coco_add_event(prob1, 'GH', 'L1', 0);
+
+    % prob1 = coco_add_slot(prob1, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
 
     % Running COCO
-    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[50 350], [400 1600]});
-    
-    prob2 = coco_prob();
-    prob2 = coco_set(prob2, 'coll', 'NTST', 200);
-    prob2 = coco_set(prob2, 'po', 'bifus', true);
-    prob2 = ode_HB2po(prob2, '', 'Initial', labs(i));
-    prob2 = coco_set(prob2, 'cont', 'PtMX', 1500);
-    prob2 = coco_set(prob2, 'cont', 'ItMX', 500);
-    prob2 = coco_set(prob2, 'cont', 'h_min', 1e-10);
-    prob2 = coco_set(prob2, 'cont', 'NAdapt', 1, 'h_max', 1);
+    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[50 350], [10000 400000]});
 
-    % Tell COCO to store extra information about the periodic orbits
-    prob2 = coco_add_slot(prob2, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
-
-    Po{i} = coco(prob2, sprintf('po_run%d', i), [], 1, {param 'po.period'}, [50 350]);
-
+    % Plotting the HB2HB continuation results
     figure(i+1); clf; hold on
     thm1 = struct('special', {{'HB', 'EP'}});
     thm2 = struct('special', {{'EP'}});
@@ -117,48 +119,108 @@ for i = 1:length(labs)
     [~,column] = find(strcmp(bdread0,'||x||_2'));
     scatter3(Inputs(Index, 1), Inputs(Index4HB, 1), bdread0{row, column}, 100, 'green', 'square', 'filled')
     hold off; grid on; view(3)
+    
+    % Want to plot a series of curves that show the values of Zs and Zu
+    % around the equilibirum after the HB point
+    % Start by defining a list of 11 indexes of evenly spaced HB points
+    % found during the HB2HB continuation
+    HBlabs = linspace(0, round(length(HBbd{1,1}(:, 1))-6, -1), 11)';
+    HBlabs(1) = 1;
 
-    figure(i+2); clf; hold on; xlabel(param); ylabel('Zs (m)'); title('Evolution of Zs with ' + convertCharsToStrings(param) + ' passing through a HB point') 
+    % Initialise figure for plotting of Zs and Zu evolutions
+    fig2 = figure(i+2); ax2 = axes('Parent', fig2); hold on; view(3); xlabel(param); ylabel('Zs (m)'); zlabel('param4HB');title('Evolution of Zs with '+convertCharsToStrings(param)+' passing through a HB point') 
     % Plot Equilibrium results for Zs
     paramep = coco_bd_col(bdread0, param); % Get the f parameter
+    param4HBep = coco_bd_col(bdread0, param4HB); % Get the vCar parameter
     xep = coco_bd_col(bdread0, 'x'); % Get the x state
     lambdaep = coco_bd_col(bdread0, 'eigs'); % Get the x state
     stabep = any(real(lambdaep)>0) ;
-    plot(paramep(~stabep), xep(1,~stabep), '.b') ;
-    plot(paramep(stabep), xep(1,stabep), '.r') ;
+    plot3(ax2, paramep(~stabep), xep(1,~stabep), param4HBep(~stabep), '.b');
+    plot3(ax2, paramep(stabep), xep(1,stabep), param4HBep(stabep), '.r');
 
-    % Plot PO results for Zs
-    bd2 = coco_bd_read(sprintf('po_run%d', i));
-    parampo = coco_bd_col(bd2, param); % Get the current parameter
-    x_max = coco_bd_col(bd2, 'x_max')';   % Get the state vector
-    x_min = coco_bd_col(bd2, 'x_min')';   % Get the state vector
-    stabpo = coco_bd_col(bd2, 'po.test.USTAB') == 0; % Get the stability
-
-    plot(parampo(stabpo), x_max(1,stabpo),'.k') ;
-    plot(parampo(~stabpo), x_max(1,~stabpo),'.m') ;
-    plot(parampo(stabpo), x_min(1,stabpo),'.k') ;
-    plot(parampo(~stabpo), x_min(1,~stabpo),'.m') ;
-    if any(~stabpo)
-        legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
-    else 
-        legend('Stable ep', 'Unstable ep', 'Stable po')
-    end
-
-    figure(i+3); clf; hold on; xlabel(param); ylabel('Zu (m)'); title('Evolution of Zu with ' + convertCharsToStrings(param) + ' passing through a HB point')
+    fig3 = figure(i+3); ax3 = axes('Parent', fig3); hold on; view(3); xlabel(param); ylabel('Zu (m)');title('Evolution of Zu with '+convertCharsToStrings(param)+' passing through a HB point')
     % Plot Equilibrium results for Zu
-    plot(paramep(~stabep), xep(2,~stabep), '.b') ;
-    plot(paramep(stabep), xep(2,stabep), '.r') ;
+    plot3(ax3, paramep(~stabep), xep(2,~stabep), param4HBep(~stabep), '.b') ;
+    plot3(ax3, paramep(stabep), xep(2,stabep), param4HBep(stabep), '.r') ;
+    
+    % Run a for loop within this for loop to get the HB2PO continuations
+    % for each of the chosen HB points
+    for j = 1:length(HBlabs)
+        prob2 = coco_prob();
+        prob2 = coco_set(prob2, 'coll', 'NTST', 200);
+        prob2 = coco_set(prob2, 'po', 'bifus', true);
+        prob2 = ode_HB2po(prob2, '', sprintf('Test%d', i), HBlabs(j));
+        prob2 = coco_set(prob2, 'cont', 'PtMX', 200);
+        prob2 = coco_set(prob2, 'cont', 'ItMX', 1500);
+        prob2 = coco_set(prob2, 'cont', 'h_min', 1e-10);
+        prob2 = coco_set(prob2, 'cont', 'NAdapt', 1, 'h_max', 1);
+        % 
+        % % Tell COCO to store extra information about the periodic orbits
+        prob2 = coco_add_slot(prob2, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
+    
+        Po{i} = coco(prob2, sprintf('po_run%d', i), [], 1, {param 'po.period'}, [50 350]);
 
-    % Plot PO results for Zu
-    plot(parampo(stabpo), x_max(2,stabpo),'.k') ;
-    plot(parampo(~stabpo), x_max(2,~stabpo),'.m') ;
-    plot(parampo(stabpo), x_min(2,stabpo),'.k') ;
-    plot(parampo(~stabpo), x_min(2,~stabpo),'.m') ;
-    if any(~stabpo)
-        legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
-    else 
-        legend('Stable ep', 'Unstable ep', 'Stable po')
+        % Plot PO results for Zs
+        bd2 = coco_bd_read(sprintf('po_run%d', i));
+        parampo = coco_bd_col(bd2, param); % Get the current parameter
+        param4HBpo = coco_bd_col(bd2, param4HB);
+        x_max = coco_bd_col(bd2, 'x_max')';   % Get the state vector
+        x_min = coco_bd_col(bd2, 'x_min')';   % Get the state vector
+        stabpo = coco_bd_col(bd2, 'po.test.USTAB') == 0; % Get the stability
+    
+        plot3(ax2, parampo(stabpo), x_max(1,stabpo), param4HBpo(stabpo),'.k') ;
+        plot3(ax2, parampo(~stabpo), x_max(1,~stabpo), param4HBpo(~stabpo),'.m') ;
+        plot3(ax2, parampo(stabpo), x_min(1,stabpo), param4HBpo(stabpo),'.k') ;
+        plot3(ax2, parampo(~stabpo), x_min(1,~stabpo), param4HBpo(~stabpo),'.m') ;
+        if any(~stabpo)
+            legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
+        else 
+            legend('Stable ep', 'Unstable ep', 'Stable po')
+        end
+
+        % Plot PO results for Zu
+        plot3(ax3, parampo(stabpo), x_max(2,stabpo), param4HBpo(stabpo),'.k') ;
+        plot3(ax3, parampo(~stabpo), x_max(2,~stabpo), param4HBpo(~stabpo),'.m') ;
+        plot3(ax3, parampo(stabpo), x_min(2,stabpo), param4HBpo(stabpo),'.k') ;
+        plot3(ax3, parampo(~stabpo), x_min(2,~stabpo), param4HBpo(~stabpo),'.m') ;
+        if any(~stabpo)
+            legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
+        else 
+            legend('Stable ep', 'Unstable ep', 'Stable po')
+        end
     end
+
+
+
+    % % Plot PO results for Zs
+    % bd2 = coco_bd_read(sprintf('po_run%d', i));
+    % parampo = coco_bd_col(bd2, param); % Get the current parameter
+    % x_max = coco_bd_col(bd2, 'x_max')';   % Get the state vector
+    % x_min = coco_bd_col(bd2, 'x_min')';   % Get the state vector
+    % stabpo = coco_bd_col(bd2, 'po.test.USTAB') == 0; % Get the stability
+    % 
+    % plot(parampo(stabpo), x_max(1,stabpo),'.k') ;
+    % plot(parampo(~stabpo), x_max(1,~stabpo),'.m') ;
+    % plot(parampo(stabpo), x_min(1,stabpo),'.k') ;
+    % plot(parampo(~stabpo), x_min(1,~stabpo),'.m') ;
+    % if any(~stabpo)
+    %     legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
+    % else 
+    %     legend('Stable ep', 'Unstable ep', 'Stable po')
+    % end
+    % 
+    % 
+    % 
+    % % Plot PO results for Zu
+    % plot(parampo(stabpo), x_max(2,stabpo),'.k') ;
+    % plot(parampo(~stabpo), x_max(2,~stabpo),'.m') ;
+    % plot(parampo(stabpo), x_min(2,stabpo),'.k') ;
+    % plot(parampo(~stabpo), x_min(2,~stabpo),'.m') ;
+    % if any(~stabpo)
+    %     legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
+    % else 
+    %     legend('Stable ep', 'Unstable ep', 'Stable po')
+    % end
    
 end
 

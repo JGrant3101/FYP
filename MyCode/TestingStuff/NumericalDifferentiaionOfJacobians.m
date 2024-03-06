@@ -8,15 +8,15 @@ x(4, :) = -0.015;
 
 p(1, :) = 180;
 p(2, :) = 50;
-p(3, :) = 10^5;
+p(3, :) = 0.9*10^5;
 p(4, :) = 3400;
-p(5, :) = 2.7 * 10^5;
+p(5, :) = 0.9*2.7 * 10^5;
 p(6, :) = 0.1;
 p(7, :) = ((250.*10^3)./(60*60));
 p(8, :) = 0.365;
-p(9, :) = 0.033;
-p(10, :) = 0.07;
-p(11, :) = 0.1*(500/9)^2;
+p(9, :) = 0.0001;
+p(10, :) = 2.4;
+p(11, :) = 0.31*(500/9)^2;
 
 % Calculating downforce from upper aero elements
 % DWFUpper = A.* vCar.^2;
@@ -64,7 +64,7 @@ for i = 1:4
         elseif i==3
             DWFUpper = p(8,:).* p(7,:).^2;
             h = p(6,:) + x(1,:) + x(2,:);
-            DWFFloorValue = DWFFloor(h, p(9,:), p(10,:), p(11,:));
+            DWFFloorValue = DWFFloorNew(h, p(9,:), p(10,:), p(11,:));
             % Find initial value of function
             x0 = -(p(3,:)./p(1,:)) .* x(1,:) + (p(3,:)./p(1,:)) .* x(2,:) - (p(4,:)./p(1,:)) .* x(3,:) + (p(4,:)./p(1,:)) .* x(4,:) - (DWFUpper + DWFFloorValue)./p(1,:);
             % Make the change to the relevant term for this loop
@@ -72,7 +72,7 @@ for i = 1:4
             temp = x;
             temp(j, :) = 1.000000001 .* x(j, :);
             htemp = p(6,:) + temp(1,:) + temp(2,:);
-            DWFFloorValue = DWFFloor(htemp, p(9,:), p(10,:), p(11,:));
+            DWFFloorValue = DWFFloorNew(htemp, p(9,:), p(10,:), p(11,:));
             % Find the new estimate of the function
             x1 = -(p(3,:)./p(1,:)) .* temp(1,:) + (p(3,:)./p(1,:)) .* temp(2,:) - (p(4,:)./p(1,:)) .* temp(3,:) + (p(4,:)./p(1,:)) .* temp(4,:) - (DWFUpper + DWFFloorValue)./p(1,:);
             % Calculate the derivative
