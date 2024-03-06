@@ -77,13 +77,13 @@ HBbd = cell(1, length(labs));
 Po = cell(1, length(labs));
 
 for i = 1:length(labs)
-    param4HB = 'A';
-    Index4HB = 8;
+    param4HB = 'Ks';
+    Index4HB = 3;
     % Creating an empty COCO problem structure
     prob1 = coco_prob();
     % Defining the settings of the problem structure
     prob1 = coco_set(prob1, 'ep', 'NSA', true);
-    prob1 = coco_set(prob1, 'cont', 'h_max', 1);
+    prob1 = coco_set(prob1, 'cont', 'h_max', 1000);
     prob1 = coco_set(prob1, 'cont', 'h_min', 1e-10);
     prob1 = coco_set(prob1, 'cont', 'PtMX', 2000);
     prob1 = coco_set(prob1, 'cont', 'ItMX', 500);
@@ -106,15 +106,15 @@ for i = 1:length(labs)
     maxparamep = max(coco_bd_col(bdread0, param));
     % minparamep = 286;
     % maxparamep = 310;
-    arrayparamep = linspace(minparamep, maxparamep, 11);
+    arrayparamep = linspace(minparamep, maxparamep, 6)';
 
-    % Adding an event to get points of interest
+    % Adding an event to check where the lyapunov coefficient is 0
     prob1 = coco_add_event(prob1, 'POI', param, arrayparamep);
 
     % prob1 = coco_add_slot(prob1, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
 
     % Running COCO
-    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[50 350], [0.01 0.3]});
+    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[50 350], [10000 200]});
 
     % Plotting the HB2HB continuation results
     figure(i+1); clf; hold on
@@ -137,7 +137,7 @@ for i = 1:length(labs)
     HBlabs = coco_bd_labs(HBbd{1,1}, 'POI');
 
     % Initialise figure for plotting of Zs and Zu evolutions
-    fig2 = figure(i+2); ax2 = axes('Parent', fig2); hold on; view(3); xlabel(param); ylabel('Zs (m)'); zlabel(param4HB);title('Evolution of Zs with '+convertCharsToStrings(param)+' passing through a HB point') 
+    fig2 = figure(i+2); ax2 = axes('Parent', fig2); hold on; view(3); xlabel(param); ylabel('Zs (m)'); zlabel('param4HB');title('Evolution of Zs with '+convertCharsToStrings(param)+' passing through a HB point') 
     % Plot Equilibrium results for Zs
     paramep = coco_bd_col(HBbd{1,1}, param); % Get the ep param at every HB point
     param4HBvals = coco_bd_col(HBbd{1,1}, param4HB); % Get the HB parameter at every HB point
@@ -148,7 +148,7 @@ for i = 1:length(labs)
     plot3(ax2, paramep, xHB(1,:), param4HBvals, 'r');
     % plot3(ax2, paramep(stabep), xep(1,stabep), param4HBep(stabep), '.r');
 
-    fig3 = figure(i+3); ax3 = axes('Parent', fig3); hold on; view(3); xlabel(param); ylabel('Zu (m)');label(param4HB);title('Evolution of Zu with '+convertCharsToStrings(param)+' passing through a HB point')
+    fig3 = figure(i+3); ax3 = axes('Parent', fig3); hold on; view(3); xlabel(param); ylabel('Zu (m)');title('Evolution of Zu with '+convertCharsToStrings(param)+' passing through a HB point')
     % Plot Zu vs param varied in ep contin and param varied in HB contin
     plot3(ax3, paramep, xHB(2,:), param4HBvals, 'r');
     % plot3(ax3, paramep(stabep), xep(2,stabep), param4HBep(stabep), '.r') ;
@@ -157,7 +157,7 @@ for i = 1:length(labs)
     % for each of the chosen HB points
     for j = 1:length(HBlabs)
         prob2 = coco_prob();
-        prob2 = coco_set(prob2, 'coll', 'NTST', 500);
+        prob2 = coco_set(prob2, 'coll', 'NTST', 200);
         prob2 = coco_set(prob2, 'po', 'bifus', true);
         prob2 = ode_HB2po(prob2, '', sprintf('Test%d', i), HBlabs(j));
         prob2 = coco_set(prob2, 'cont', 'PtMX', 200);
