@@ -77,8 +77,8 @@ HBbd = cell(1, length(labs));
 Po = cell(1, length(labs));
 
 for i = 1:length(labs)
-    param4HB = 'H';
-    Index4HB = 6;
+    param4HB = 'A';
+    Index4HB = 8;
     % Creating an empty COCO problem structure
     prob1 = coco_prob();
     % Defining the settings of the problem structure
@@ -114,7 +114,7 @@ for i = 1:length(labs)
     % prob1 = coco_add_slot(prob1, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
 
     % Running COCO
-    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[50 350], [0.05 0.12]});
+    HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[50 350], [0.2 2]});
 
     % Plotting the HB2HB continuation results
     figure(i+1); clf; hold on
@@ -135,23 +135,6 @@ for i = 1:length(labs)
     % around the equilibirum after the HB point
     % Start by finding the array of labs of points of interest
     HBlabs = coco_bd_labs(HBbd{1,1}, 'POI');
-
-    % Initialise figure for plotting of Zs and Zu evolutions
-    fig2 = figure(i+2); ax2 = axes('Parent', fig2); hold on; view(3); xlabel(param); ylabel('Zs (m)'); zlabel(param4HB);title('Evolution of Zs with '+convertCharsToStrings(param)+' passing through a HB point') 
-    % Plot Equilibrium results for Zs
-    paramep = coco_bd_col(HBbd{1,1}, param); % Get the ep param at every HB point
-    param4HBvals = coco_bd_col(HBbd{1,1}, param4HB); % Get the HB parameter at every HB point
-    xHB = coco_bd_col(HBbd{1,1}, 'x'); % Get the x state at every HB point
-    % lambdaep = coco_bd_col(bdread0, 'eigs'); % Get the x state
-    % stabep = any(real(lambdaep)>0) ;
-    % Plot Zs vs param varied in ep contin and param varied in HB contin
-    plot3(ax2, paramep, xHB(1,:), param4HBvals, 'r');
-    % plot3(ax2, paramep(stabep), xep(1,stabep), param4HBep(stabep), '.r');
-
-    fig3 = figure(i+3); ax3 = axes('Parent', fig3); hold on; view(3); xlabel(param); ylabel('Zu (m)'); zlabel(param4HB);title('Evolution of Zu with '+convertCharsToStrings(param)+' passing through a HB point')
-    % Plot Zu vs param varied in ep contin and param varied in HB contin
-    plot3(ax3, paramep, xHB(2,:), param4HBvals, 'r');
-    % plot3(ax3, paramep(stabep), xep(2,stabep), param4HBep(stabep), '.r') ;
     
     % Run a for loop within this for loop to get the HB2PO continuations
     % for each of the chosen HB points
@@ -183,39 +166,60 @@ for i = 1:length(labs)
 
             % Running a relevant EP for the parameter that was changed
             bdep = coco(prob, sprintf('epfrompo_run%d', j), @ode_isol2ep, args{:}, variableargs{:});
+            
+            % Plotting Zs results
+            % Plotting the ep values
+            figure
+            xep = coco_bd_col(bdep, 'x')';
+            zsep = xep(:, 1);
+            vCarep = coco_bd_col(bdep, 'vCar')';
 
-            % Plot PO results for Zs
-            bd2 = coco_bd_read(sprintf('po_run%d', i));
-            parampo = coco_bd_col(bd2, param); % Get the current parameter
-            param4HBpo = coco_bd_col(bd2, param4HB);
-            x_max = coco_bd_col(bd2, 'x_max')';   % Get the state vector
-            x_min = coco_bd_col(bd2, 'x_min')';   % Get the state vector
-            stabpo = coco_bd_col(bd2, 'po.test.USTAB') == 0; % Get the stability
-        
-            plot3(ax2, parampo(stabpo), x_max(1,stabpo), param4HBpo(stabpo),'.k') ;
-            plot3(ax2, parampo(~stabpo), x_max(1,~stabpo), param4HBpo(~stabpo),'.m') ;
-            plot3(ax2, parampo(stabpo), x_min(1,stabpo), param4HBpo(stabpo),'.k') ;
-            plot3(ax2, parampo(~stabpo), x_min(1,~stabpo), param4HBpo(~stabpo),'.m') ;
-            % if any(~stabpo)
-            %     legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
-            % else 
-            %     legend('Stable ep', 'Unstable ep', 'Stable po')
-            % end
-    
-            % Plot PO results for Zu
-            plot3(ax3, parampo(stabpo), x_max(2,stabpo), param4HBpo(stabpo),'.k') ;
-            plot3(ax3, parampo(~stabpo), x_max(2,~stabpo), param4HBpo(~stabpo),'.m') ;
-            plot3(ax3, parampo(stabpo), x_min(2,stabpo), param4HBpo(stabpo),'.k') ;
-            plot3(ax3, parampo(~stabpo), x_min(2,~stabpo), param4HBpo(~stabpo),'.m') ;
-            % if any(~stabpo)
-            %     legend('Stable ep', 'Unstable ep', 'Stable po', 'Unstable po')
-            % else 
-            %     legend('Stable ep', 'Unstable ep', 'Stable po')
-            % end
+            plot(vCarep, zsep)
+            hold on
+
+            % Plotting the PO values
+            vCarPO = coco_bd_col(Po{i}, param);
+            x_max = coco_bd_col(Po{i}, 'x_max')';   % Get the state vector
+            x_min = coco_bd_col(Po{i}, 'x_min')';   % Get the state vector
+            stabpo = coco_bd_col(Po{i}, 'po.test.USTAB') == 0; % Get the stability
+            
+            zs_max = x_max(1, :);
+            zs_min = x_min(1, :);
+
+            plot(vCarPO(stabpo), zs_max(stabpo),'.k') ;
+            plot(vCarPO(~stabpo), zs_max(~stabpo),'.m') ;
+            plot(vCarPO(stabpo), zs_min(stabpo),'.k') ;
+            plot(vCarPO(~stabpo), zs_min(~stabpo),'.m') ;
+
+            xlabel('vCar (kph)')
+            ylabel('Zs (m)')
+            title(['EP and PO values of Zs across vCar range with ' param4HB ' set to: ' num2str(Inputsep(Index4HB, 1))])
+            
+            legend('Ep values', 'Stable PO results', 'Unstable PO results')
+            % Plotting the Zu results
+            % Plotting the ep values
+            figure
+            zuep = xep(:, 2);
+
+            plot(vCarep, zuep)
+            hold on
+
+            % Plotting the PO values
+            zu_max = x_max(2, :);
+            zu_min = x_min(2, :);
+
+            plot(vCarPO(stabpo), zu_max(stabpo),'.k') ;
+            plot(vCarPO(~stabpo), zu_max(~stabpo),'.m') ;
+            plot(vCarPO(stabpo), zu_min(stabpo),'.k') ;
+            plot(vCarPO(~stabpo), zu_min(~stabpo),'.m') ;
+
+            xlabel('vCar (kph)')
+            ylabel('Zu (m)')
+            title(['EP and PO values of Zu across vCar range with ' param4HB ' set to: ' num2str(Inputsep(Index4HB, 1))])
+
+            legend('Ep values', 'Stable PO results', 'Unstable PO results')
         end
     end
-   legend(ax2, {'Stable ep', 'Unstable ep', 'Stable po', 'Unstable po'})
-   legend(ax3, {'Stable ep', 'Unstable ep', 'Stable po', 'Unstable po'})
 end
 
 
