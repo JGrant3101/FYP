@@ -20,31 +20,31 @@ Inputs(5, 1) = 1.98;
 % Distance from rear axle to CoG (m)
 Inputs(6, 1) = 1.62;
 % Front tyre vertical stiffness (N/m)
-Inputs(7, 1) = 2.7 * 10^5;
+Inputs(7, 1) = 2 * 2.7 * 10^5;
 % Front Suspension stiffness (N/m)
-Inputs(8, 1) = 2 * 10^5;
+Inputs(8, 1) = 1.5 * 2 * 10^5;
 % Rear tyre vertical stiffness (N/m)
-Inputs(9, 1) =  0.9 * 2.7 * 10^5;
+Inputs(9, 1) =  2 * 0.9 * 2.7 * 10^5;
 % Rear Suspension stiffness (N/m)
-Inputs(10, 1) = 1.81 * 10^5;
+Inputs(10, 1) = 1.5 * 1.81 * 10^5;
 % Front damping (Ns/m)
-Inputs(11, 1) = 4800;
+Inputs(11, 1) = 9247;
 % Rear damping (Ns/m)
-Inputs(12, 1) = 4370;
+Inputs(12, 1) = 9739;
 % Static front ride height (m)
 Inputs(13, 1) = 0.0943;
 % Static rear ride height (m)
 Inputs(14, 1) = 0.11;
 % Car speed (kph)
-Inputs(15, 1) = 320;
+Inputs(15, 1) = 300;
 % Front wing aero multiplier
 Inputs(16, 1) = 0.254;
 % Rear wing aero multiplier
 Inputs(17, 1) = 0.636;
 % Front downforce from floor gradient
-Inputs(18, 1) = 15.26;
+Inputs(18, 1) = 0.5;
 % Front downforce from floor constant
-Inputs(44, 1) = 0;
+Inputs(41, 1) = 0.3;
 
 % Reading in the mat file that contains the parameters needed for the floor
 % aero model
@@ -61,27 +61,27 @@ Inputs(25, 1) = fittedDWFfunc.p30;
 Inputs(26, 1) = fittedDWFfunc.p21;
 Inputs(27, 1) = fittedDWFfunc.p12;
 Inputs(28, 1) = fittedDWFfunc.p03;
-Inputs(29, 1) = fittedDWFfunc.p40;
-Inputs(30, 1) = fittedDWFfunc.p31;
-Inputs(31, 1) = fittedDWFfunc.p22;
-Inputs(32, 1) = fittedDWFfunc.p13;
-Inputs(33, 1) = fittedDWFfunc.p04;
-Inputs(34, 1) = fittedDWFfunc.p50;
-Inputs(35, 1) = fittedDWFfunc.p41;
-Inputs(36, 1) = fittedDWFfunc.p32;
-Inputs(37, 1) = fittedDWFfunc.p23;
-Inputs(38, 1) = fittedDWFfunc.p14;
-Inputs(39, 1) = fittedDWFfunc.p05;
-Inputs(40, 1) = avgRHmean;
-Inputs(41, 1) = avgRHstd;
-Inputs(42, 1) = vCarmean;
-Inputs(43, 1) = vCarstd;
+%Inputs(29, 1) = fittedDWFfunc.p40;
+Inputs(29, 1) = fittedDWFfunc.p31;
+Inputs(30, 1) = fittedDWFfunc.p22;
+Inputs(31, 1) = fittedDWFfunc.p13;
+Inputs(32, 1) = fittedDWFfunc.p04;
+%Inputs(34, 1) = fittedDWFfunc.p50;
+%Inputs(35, 1) = fittedDWFfunc.p41;
+Inputs(33, 1) = fittedDWFfunc.p32;
+Inputs(34, 1) = fittedDWFfunc.p23;
+Inputs(35, 1) = fittedDWFfunc.p14;
+Inputs(36, 1) = fittedDWFfunc.p05;
+Inputs(37, 1) = avgRHmean;
+Inputs(38, 1) = avgRHstd;
+Inputs(39, 1) = vCarmean;
+Inputs(40, 1) = vCarstd;
 
 % Floor road interaction parameters
 % Coefficient of resitution
-Inputs(45, 1) = 0.8;
+Inputs(42, 1) = 0.8;
 
-sol = ode45(@(t, x)SuspensionWithTime(t, x, Inputs), [0, 1], [0; 0; 0; 0; 0; 0; 0; 0], odeset('RelTol', 1e-4)); % Simulate 
+sol = ode45(@(t, x)SuspensionWithTime(t, x, Inputs), [0, 5], [-0.01; -0.01; -0.02; 0.0044; 0; 0; 0; 0], odeset('RelTol', 1e-4)); % Simulate 
 % DWFFloorResults = DWFFloor((Inputs(6, 1) + sol.y(1, :) + sol.y(2, :))', Inputs(9, 1), Inputs(10, 1), Inputs(11, 1))';
 tiledlayout(3, 2); nexttile; plot(sol.x, sol.y(1, :)); title('ZuF vs time'); nexttile; plot(sol.x, sol.y(2, :)); ...
     title('ZuR vs time'); nexttile; plot(sol.x, sol.y(3, :)); title('Zs vs time'); nexttile; plot(sol.x, sol.y(4, :)); title('Theta vs time');...
@@ -143,6 +143,9 @@ FloorProfile = a * FloorArray.^3 + b * FloorArray.^2 + c * FloorArray + d;
 % Creating emtpy arrays to populate with values
 DWFFloorF = zeros(length(sol.x), 1);
 DWFFloorR = zeros(length(sol.x), 1);
+TotalDWFFloor = zeros(length(sol.x), 1);
+avgRH = zeros(length(sol.x), 1);
+minfloorpoint = zeros(length(sol.x), 1);
 
 % Running the for loop
 for i = 1:length(sol.x)
@@ -163,10 +166,11 @@ for i = 1:length(sol.x)
     
     % Now that the dynamic floor profile has been found can compute the average
     % distance from the road to the floor
-    avgRH = mean(TempFloorProfile);
+    avgRH(i) = mean(TempFloorProfile);
+    minfloorpoint(i) = min(TempFloorProfile);
     
     % Normalising the vCar and average distance to road values 
-    avgRHnormalised = (avgRH - Inputs(37, 1)) ./ Inputs(38, 1);
+    avgRHnormalised = (avgRH(i) - Inputs(37, 1)) ./ Inputs(38, 1);
     vCarnormalised = (Inputs(15, 1) - Inputs(39, 1)) ./ Inputs(40, 1);
     
     % Setting variables as x and y 
@@ -174,25 +178,37 @@ for i = 1:length(sol.x)
     y = vCarnormalised;
     
     % Predicting the total downforce produced by the floor
-    TotalDWFFloor = Inputs(19, 1) + Inputs(20, 1).*z + Inputs(21, 1).*y + Inputs(22, 1).*z.^2 + Inputs(23, 1).*z.*y + Inputs(24, 1).*y.^2 + Inputs(25, 1).*z.^3 + Inputs(26, 1).*z.^2.*y + Inputs(27, 1).*z.*y.^2 + Inputs(28, 1).*y.^3 + p40.*z.^4 ...
-        + Inputs(29, 1).*z.^3.*y + Inputs(30, 1).*z.^2.*y.^2 + Inputs(31, 1).*z.*y.^3 + Inputs(32, 1).*y.^4 + p50.*z.^5 + p41.*z.^4.*y + ...
-        Inputs(33, 1).*z.^3.*y.^2 + Inputs(34, 1).*z.^2.*y.^3 + Inputs(35, 1).*z.*y.^4 + Inputs(36, 1).*y.^5;
+    TotalDWFFloor(i) = Inputs(19, 1) + Inputs(20, 1).*z + Inputs(21, 1).*y + Inputs(22, 1).*z.^2 + Inputs(23, 1).*z.*y + Inputs(24, 1).*y.^2 + Inputs(25, 1).*z.^3 + Inputs(26, 1).*z.^2.*y + Inputs(27, 1).*z.*y.^2 + Inputs(28, 1).*y.^3 ... % + Inputs(29, 1).*z.^4 ...
+        + Inputs(29, 1).*z.^3.*y + Inputs(30, 1).*z.^2.*y.^2 + Inputs(31, 1).*z.*y.^3 + Inputs(32, 1).*y.^4 ...%  + Inputs(34, 1).*z.^5 + Inputs(35, 1).*z.^4.*y + ...
+        + Inputs(33, 1).*z.^3.*y.^2 + Inputs(34, 1).*z.^2.*y.^3 + Inputs(35, 1).*z.*y.^4 + Inputs(36, 1).*y.^5;
+
+    % TotalDWFFloor(i) = heaviside(min(TempFloorProfile)) .* TotalDWFFloor(i);
     
     % Calculating the DWF on the front axle from the floor using the linear
     % approximation
     hF = Inputs(13, 1) + sol.y(3, i) + sol.y(1, i) - Inputs(5, 1) .* sol.y(4, i);
-    % DWFFloorF(i) = Inputs(41, 1) + Inputs(18, 1) .* ((Inputs(15, 1).*10^3)./(60*60)).^2 .* (0.0969 - hF);
-    DWFFloorF(i) = 0.4 * TotalDWFFloor;
+    % DWFFloorF(i) = Inputs(38, 1) + Inputs(18, 1) .* ((Inputs(15, 1).*10^3)./(60*60)).^2 .* (FloorProfile(1) - TempFloorProfile(1));
+    DWFFloorF(i) = 0.45 * TotalDWFFloor(i);
+    % DWFFloorF(i) = (Inputs(41, 1) + Inputs(18, 1) .* ((FloorProfile(1) - TempFloorProfile(1)) ./ FloorProfile(1))) .* TotalDWFFloor(i);
     
     % From this obtaining the DWF on the rear axle from the floor
-    DWFFloorR(i) = TotalDWFFloor - DWFFloorF(i);
+    DWFFloorR(i) = TotalDWFFloor(i) - DWFFloorF(i);
 end
 
 figure
-tiledlayout(2, 1)
+tiledlayout(3, 2)
 nexttile
 plot(sol.x, DWFFloorF)
 title('DWFFloorF')
 nexttile
 plot(sol.x, DWFFloorR)
 title('DWFFloorR')
+nexttile([1, 2])
+plot(sol.x, TotalDWFFloor)
+title('Total floor downforce')
+nexttile
+plot(sol.x, avgRH)
+title('Average ride height value')
+nexttile
+plot(sol.x, minfloorpoint)
+title('Minimum floor height')

@@ -1,0 +1,76 @@
+MATLAB version 23.2.0.2380103 (R2023b) Update 1 on architecture win64
+
+run: { runid='Test1' toolbox='empty' tbxctor=@empty_ctor isol_type='' sol_type='' dir='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\ReportCode\data\Test1' bdfname='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\ReportCode\data\Test1\bd.mat' logname='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\ReportCode\data\Test1\coco_log.txt' scrname='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\ReportCode\data\Test1\coco_scr.txt' }
+
+all: { TOL=1e-06 CleanData=false LogLevel=1 data_dir='C:\Users\joegr\Repos\FYP\MyCode\Porpoising\ReportCode\data' }
+  +-ep: { NSA=true }
+  +-cont: { h_max=5 h_min=1e-10 PtMX=2000 ItMX=5000 NAdapt=1 }
+  +-lsol: { det=true }
+
+funcs
+  +-ep: { type='zero' }
+  | +-pars: { type='inactive' pars={ 'Ms' 'Mu' 'Ks' 'Cs' 'Kt' 'H' 'vCar' 'A' 'mew' 'lamda' 'scaling' } }
+  | +-var: { type='zero' }
+  | +-HB: { type='zero' }
+  | +-test: { type='regular' pars={ 'ep.test.BTP' } }
+  +-hb_glue: { type='zero' }
+  +-lyap: { type='regular' pars={ 'L1' } }
+  +-cseg
+  | +-prcond: { type='zero' }
+  +-atlas
+    +-test
+      +-BP: { type='singular' pars={ 'atlas.test.BP' } }
+      +-FP: { type='singular' pars={ 'atlas.test.FP' } }
+
+slots
+  +-ep: { signals={ 'bddat@bddat' 'save_full@coco_save_data' } }
+  | +-HB: { signal='update@update' }
+  +-cseg
+  | +-fix_mfunc: { signal='fix_mfunc@CurveSegmentBase.fix_mfunc' }
+  | +-remesh: { signal='remesh@CurveSegmentBase.remesh' }
+  | +-set_mode: { signal='set_mode@CurveSegmentBase.set_mode' }
+  | +-update: { signal='update@CurveSegmentBase.update' }
+  | +-update_h: { signal='update_h@CurveSegmentBase.update_h' }
+  | +-update_w: { signal='update_w@CurveSegmentBase.update_w' }
+  +-tb_info: { signals={ 'save_bd@coco_save_data' 'save_reduced@coco_save_data' } }
+  +-run: { signal='save_bd@save_run' }
+  +-bd: { signal='save_bd@save_bd' }
+  +-bddat: { signal='save_bd@save_bddat' }
+  +-lsol
+    +-det: { signal='set_mode@set_save_det' }
+
+signals
+  +-save_bd: { owner='coco' slots={ 'tb_info@coco_save_data' 'run@save_run' 'bd@save_bd' 'bddat@save_bddat' } }
+  +-update: { owner='CurveSegmentBase' slots={ 'ep.HB@update' 'cseg.update@CurveSegmentBase.update' } }
+  +-set_mode: { owner='CurveSegmentBase' slots={ 'cseg.set_mode@CurveSegmentBase.set_mode' 'lsol.det@set_save_det' } }
+  +-update_h: { owner='CurveSegmentBase' slots={ 'cseg.update_h@CurveSegmentBase.update_h' } }
+  +-fix_mfunc: { owner='CurveSegmentBase' slots={ 'cseg.fix_mfunc@CurveSegmentBase.fix_mfunc' } }
+  +-remesh: { owner='atlas_1d' slots={ 'cseg.remesh@CurveSegmentBase.remesh' } }
+  +-bddat: { owner='AtlasBase' slots={ 'ep@bddat' } }
+  +-save_full: { owner='AtlasBase' slots={ 'ep@coco_save_data' } }
+  +-save_reduced: { owner='AtlasBase' slots={ 'tb_info@coco_save_data' } }
+
+*********************************************************************
+
+    STEP   DAMPING               NORMS              COMPUTATION TIMES
+  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
+   0                          7.99e+01  2.59e+05    0.0    0.0    0.0
+   1   4  1.25e-01  7.91e+01  2.93e+04  2.59e+05    0.0    0.0    0.0
+   2   1  1.00e+00  1.03e+02  3.46e+03  2.59e+05    0.0    0.0    0.0
+   3   1  2.88e-13  1.61e+12  3.46e+03  2.59e+05    0.0    0.0    0.0
+   4   3  5.36e-14  2.79e+12  3.46e+03  2.59e+05    0.0    0.0    0.0
+   5   1  2.35e-13  2.76e+12  3.46e+03  2.59e+05    0.0    0.0    0.0
+   6   4  2.48e-14  4.35e+12  3.46e+03  2.59e+05    0.0    0.0    0.0
+   7   1  1.14e-13  7.27e+12  3.46e+03  2.59e+05    0.0    0.0    0.0
+   8   1  4.05e-13  2.73e+12  3.46e+03  2.59e+05    0.0    0.0    0.0
+   9   1  1.42e-13  1.04e+13  3.46e+03  2.59e+05    0.0    0.1    0.0
+  10   1  9.39e-13  1.04e+12  3.46e+03  2.59e+05    0.0    0.1    0.0
+
+warning: state_co_correct: correction failed
+no convergence of Newton's method within 10 iterations
+
+ STEP   STEP SIZE      TIME        ||U||  LABEL  TYPE             H         vCar
+   -1    0.00e+00  00:00:00   2.5925e+05      1  MX             ---          ---
+
+POINT -1: computation finished
+*********************************************************************

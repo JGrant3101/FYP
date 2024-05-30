@@ -58,7 +58,7 @@ AR = p(17, :);
 % Front downforce from floor gradient
 m = p(18, :);
 % Front downforce from floor constant
-DWFFloorFConstant = p(44, :);
+DWFFloorFConstant = p(41, :);
 
 % Downforce from floor polynomial terms
 p00 = p(19, :);
@@ -71,24 +71,24 @@ p30 = p(25, :);
 p21 = p(26, :);
 p12 = p(27, :);
 p03 = p(28, :);
-p40 = p(29, :);
-p31 = p(30, :);
-p22 = p(31, :);
-p13 = p(32, :);
-p04 = p(33, :);
-p50 = p(34, :);
-p41 = p(35, :);
-p32 = p(36, :);
-p23 = p(37, :);
-p14 = p(38, :);
-p05 = p(39, :);
-avgRHmean = p(40, :);
-avgRHstd = p(41, :);
-vCarmean = p(42, :);
-vCarstd = p(43, :);
+%p40 = p(29, :);
+p31 = p(29, :);
+p22 = p(30, :);
+p13 = p(31, :);
+p04 = p(32, :);
+%p50 = p(34, :);
+%p41 = p(35, :);
+p32 = p(33, :);
+p23 = p(34, :);
+p14 = p(35, :);
+p05 = p(36, :);
+avgRHmean = p(37, :);
+avgRHstd = p(38, :);
+vCarmean = p(39, :);
+vCarstd = p(40, :);
 
 % Floor road interaction parameters
-e = p(45, 1);
+e = p(42, 1);
 
 % Calculating downforce values from wings
 DWFFrontWing = AF .* vCar.^2;
@@ -141,11 +141,11 @@ c = values(3);
 d = values(4);
 
 % Defining the floor profile
-FloorProfile = a * FloorArray.^3 + b * FloorArray.^2 + c * FloorArray + d;
+StaticFloorProfile = a * FloorArray.^3 + b * FloorArray.^2 + c * FloorArray + d;
 
 % Converting this static floor profile into the dynamic floor profile
 % First by applying the sprung mass displacment
-FloorProfile = FloorProfile + Zs;
+FloorProfile = StaticFloorProfile + Zs;
 
 % Then by applying the angle of the sprung mass
 THETAChange = THETAs - atan((StaticRRH - StaticFRH) / (LF + LR));
@@ -160,6 +160,7 @@ FloorProfile = FloorProfile + FloorVertChangeDue2Rotation;
 % Now that the dynamic floor profile has been found can compute the average
 % distance from the road to the floor
 avgRH = mean(FloorProfile);
+FloorProfileMin = min(FloorProfile);
 
 % Normalising the vCar and average distance to road values 
 avgRHnormalised = (avgRH - avgRHmean) ./ avgRHstd;
@@ -170,14 +171,17 @@ z = avgRHnormalised;
 y = vCarnormalised;
 
 % Predicting the total downforce produced by the floor
-TotalDWFFloor = p00 + p10.*z + p01.*y + p20.*z.^2 + p11.*z.*y + p02.*y.^2 + p30.*z.^3 + p21.*z.^2.*y + p12.*z.*y.^2 + p03.*y.^3 + p40.*z.^4 ...
-    + p31.*z.^3.*y + p22.*z.^2.*y.^2 + p13.*z.*y.^3 + p04.*y.^4 + p50.*z.^5 + p41.*z.^4.*y + ...
-    p32.*z.^3.*y.^2 + p23.*z.^2.*y.^3 + p14.*z.*y.^4 + p05.*y.^5;
+TotalDWFFloor = p00 + p10.*z + p01.*y + p20.*z.^2 + p11.*z.*y + p02.*y.^2 + p30.*z.^3 + p21.*z.^2.*y + p12.*z.*y.^2 + p03.*y.^3 ... % + p40.*z.^4 ...
+    + p31.*z.^3.*y + p22.*z.^2.*y.^2 + p13.*z.*y.^3 + p04.*y.^4 ... % + p50.*z.^5 + p41.*z.^4.*y ...
+    + p32.*z.^3.*y.^2 + p23.*z.^2.*y.^3 + p14.*z.*y.^4 + p05.*y.^5;
+
+% TotalDWFFloor = heaviside(FloorProfileMin) .* TotalDWFFloor;
 
 % Calculating the DWF on the front axle from the floor using the linear
 % approximation
-% DWFFloorF = DWFFloorFConstant + m .* vCar.^2 .* (0.0969 - hF);
-DWFFloorF = 0.4 * TotalDWFFloor;
+% DWFFloorF = DWFFloorFConstant + m .* vCar.^2 .* (StaticFloorProfile(1) - FloorProfile(1));
+DWFFloorF = 0.45 * TotalDWFFloor;
+% DWFFloorF = (DWFFloorFConstant + m .* ((StaticFloorProfile(1) - FloorProfile(1)) ./ StaticFloorProfile(1))) .* TotalDWFFloor;
 
 % From this obtaining the DWF on the rear axle from the floor
 DWFFloorR = TotalDWFFloor - DWFFloorF;
@@ -185,18 +189,23 @@ DWFFloorR = TotalDWFFloor - DWFFloorF;
 % Therefore calculating the total DWF acting on the front and rear axles
 DWFF = DWFFrontWing + DWFFloorF;
 DWFR = DWFRearWing + DWFFloorR;
+% DWFF = DWFFrontWing;
+% DWFR = DWFRearWing;
 
 % Can now run the parameters through the equations of motion
 rhs = zeros(size(x));
 rhs(1, :) = PhiuF;
 rhs(2, :) = PhiuR;
+% rhs(3, :) = heaviside(FloorProfileMin) .* Phis + heaviside(-FloorProfileMin) .* -e .* Phis;
 rhs(3, :) = Phis;
 rhs(4, :) = PhiTHETAs;
 
 rhs(5, :) = (KsF ./ MuF) .* (Zs - ZuF - LF .* THETAs) + (CsF ./ MuF) .* (Phis - PhiuF - LF .* PhiTHETAs) - (KtF ./ MuF) .* ZuF;
 rhs(6, :) = (KsR ./ MuR) .* (Zs + LR .* THETAs - ZuR) + (CsR ./ MuR) .* (Phis + LR .* PhiTHETAs - PhiuR) - (KtR ./ MuR) .* ZuR;
+% rhs(7, :) = -(KsF ./ Ms) .* (Zs - ZuF - LF .* THETAs) - (CsF ./ Ms) .* (Phis - PhiuF - LF .* PhiTHETAs) - (KsR ./ Ms) .* (Zs + LR .* THETAs - ZuR) ...
+%     - (CsR ./ Ms) .* (Phis + LR .* PhiTHETAs - PhiuR) - DWFF ./ Ms - DWFR ./ Ms + heaviside(-FloorProfileMin) .* Phis .* (e + 1);
 rhs(7, :) = -(KsF ./ Ms) .* (Zs - ZuF - LF .* THETAs) - (CsF ./ Ms) .* (Phis - PhiuF - LF .* PhiTHETAs) - (KsR ./ Ms) .* (Zs + LR .* THETAs - ZuR) ...
-    - (CsR ./ Ms) .* (Phis + LR .* PhiTHETAs - PhiuR) - DWFF ./ Ms - DWFR ./ Ms + heaviside(-min(FloorProfile)) * Ms * Phis * (e - 1);
+    - (CsR ./ Ms) .* (Phis + LR .* PhiTHETAs - PhiuR) - DWFF ./ Ms - DWFR ./ Ms;
 rhs(8, :) = (LF ./ Is) .* (KsF .* (Zs - ZuF - LF .* THETAs) + CsF .* (Phis - PhiuF - LF .* PhiTHETAs) + DWFF) ...
     - (LR ./ Is) .* (KsR .* (Zs + LR .* THETAs - ZuR) + CsR .* (Phis + LR .* PhiTHETAs - PhiuR) + DWFR);
 

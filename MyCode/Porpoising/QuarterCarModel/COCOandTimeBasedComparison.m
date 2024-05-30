@@ -3,7 +3,7 @@
 % script
 format long
 % Start by setting up the inputs
-t = [0:0.1:100]';
+t = [0:0.01:10]';
 % Our Inputs struct is already set up but want to use a value for a
 % parameter that, according to COCO, will result in oscillations
 paramtest = 'Kt';
@@ -26,7 +26,7 @@ COCOrideheightAmplitudes = zeros(N, 1);
 
 COCOFreqs = zeros(N, 1);
 for i = 1:N
-    Inputs(5, 1) = paramtestvalues(i);
+    Inputs(Index4HB, 1) = paramtestvalues(i);
     % Time based test
     maxtime = 10;
     % Run the simulation and plot the results
@@ -170,7 +170,7 @@ for i = 1:N
     % and report it to compare with the time based sim values
     % Want to start by interpolating the min and max values for Zs and Zu,
     % firstly need to ensure everything is only unique values
-    [parampounique ia ib] = unique(parampo);
+    [parampounique ia ib] = unique(vCarPO);
     x_max_unique = x_max(:, ia);
     x_min_unique = x_min(:, ia);
     
