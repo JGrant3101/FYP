@@ -1,6 +1,6 @@
 % Plotting the IDG and LND curves used
 h = linspace(0, 0.1, 1001)';
-IGD = DWFFloor(h, 0.033, 0.07, 0.31*(500/9)^2);
+IGD = DWFFloorOLD(h, 0.033, 0.07, 0.31*(500/9)^2);
 LND = DWFFloorNew(h, 0.0001, 2.4, 0.31*(500/9)^2); % Original scaling value was 956.7901
 
 figure

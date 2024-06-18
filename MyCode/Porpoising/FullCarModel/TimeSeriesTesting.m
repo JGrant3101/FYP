@@ -183,8 +183,8 @@ for i = 1:length(sol.x)
     minfloorpoint(i) = min(TempFloorProfile);
     
     % Normalising the vCar and average distance to road values 
-    avgRHnormalised = (avgRH(i) - Inputs(37, 1)) ./ Inputs(38, 1);
-    vCarnormalised = (Inputs(15, 1) - Inputs(39, 1)) ./ Inputs(40, 1);
+    avgRHnormalised = (avgRH(i) - Inputs(36, 1)) ./ Inputs(37, 1);
+    vCarnormalised = (Inputs(15, 1) - Inputs(38, 1)) ./ Inputs(39, 1);
     
     % Setting variables as x and y 
     z = avgRHnormalised;

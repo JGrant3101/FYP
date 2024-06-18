@@ -1,3 +1,5 @@
+% This script first requires running the coco_cont script in the quarter
+% car model folder
 % Fitting quadratic regression to family of Hopf points
 vCar = coco_bd_col(HBbd{1}, 'vCar')';
 otherparam = coco_bd_col(HBbd{1}, param4HB)';

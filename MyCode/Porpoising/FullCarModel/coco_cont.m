@@ -73,9 +73,9 @@ Inputs(39, 1) = vCarstd;
 x0 = [-0.02; -0.03; -0.07; -0.009; 0; 0; 0; 0];
 
 % Defining the names of the inputs already written above
-pnames = {'MuF' 'MuR' 'Ms' 'Is' 'LF' 'LR' 'KtF' 'KsF' 'KtR' 'KsR' 'CsF' 'CsR' 'StaticFRH' 'StaticRRH' 'vCar' 'AF' 'AR' 'm' 'p00' 'p10' ...
+pnames = {'MuF' 'MuR' 'Ms' 'Is' 'LF' 'LR' 'KtF' 'KsF' 'KtR' 'KsR' 'CsF' 'CsR' 'StaticFRH' 'StaticRRH' 'vCar' 'AF' 'AR' 'p00' 'p10' ...
     'p01' 'p20' 'p11' 'p02' 'p30' 'p21' 'p12' 'p03' 'p31' 'p22' 'p13' 'p04' 'p32' 'p23' 'p14' 'p05' 'avgRHmean' 'avgRHstd' 'vCarmean' ...
-    'vCarstd' 'DWFFloorFConstant' 'e'};
+    'vCarstd'};
 
 % Initialising the COCO problem
 prob = coco_prob();
@@ -264,7 +264,7 @@ function bdread0 = varyingparameters(param2vary, range, prob, args, Inputs)
     [~,column] = find(strcmp(bdread0,param2vary));
     IndependentVar_val = cell2mat([bdread0(2:end,column)])' ;
 
-    x_val = cell2mat([bdread0(2:end,59)]') ;
+    x_val = cell2mat([bdread0(2:end,56)]') ;
     figure ; plot(IndependentVar_val, x_val(1:2,:)) ;
     hep = Inputs(6, 1) + x_val(1,:) + x_val(2,:);
     hold on

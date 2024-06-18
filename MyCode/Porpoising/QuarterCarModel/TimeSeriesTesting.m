@@ -33,7 +33,7 @@ Inputs(11, 1) = 0.31*(500/9)^2;
 maxtime = 10;
 
 sol = ode45(@(t, x)SuspensionWithTime(t, x, Inputs), [0, maxtime], [-0.07; -0.02; 0; 0; 0; 0], odeset('RelTol', 1e-8)); % Simulate 
-DWFFloorResults = DWFFloor((Inputs(6, 1) + sol.y(1, :) + sol.y(2, :))', Inputs(9, 1), Inputs(10, 1), Inputs(11, 1))';
+DWFFloorResults = DWFFloorNew((Inputs(6, 1) + sol.y(1, :) + sol.y(2, :))', Inputs(9, 1), Inputs(10, 1), Inputs(11, 1))';
     tiledlayout(1, 3); nexttile; plot(sol.x, sol.y(1, :)); title('Zs vs time'); xlabel('Time (seconds)'); ylabel('Zs (m)');
     nexttile; plot(sol.x, sol.y(2, :)); title('Zu vs time'); xlabel('Time (seconds)'); ylabel('Zu (m)'); nexttile;
     plot(sol.x, Inputs(6, 1) + sol.y(1, :) + sol.y(2, :)); title('Ride height vs time'); xlabel('Time (seconds)'); ylabel('h (m)');

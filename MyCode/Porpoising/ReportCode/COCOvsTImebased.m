@@ -217,7 +217,7 @@ for i = 1:N
     maxtime = 10;
     % Run the simulation and plot the results
     sol = ode45(@(t, x)SuspensionWithTime(t, x, Inputs), [0, maxtime], [-0.031; -0.008; 0; 0; 0; 0], odeset('RelTol', 1e-8)); % Simulate 
-    DWFFloorResults = DWFFloor((Inputs(6, 1) + sol.y(1, :) + sol.y(2, :))', Inputs(9, 1), Inputs(10, 1), Inputs(11, 1))';
+    DWFFloorResults = DWFFloorNew((Inputs(6, 1) + sol.y(1, :) + sol.y(2, :))', Inputs(9, 1), Inputs(10, 1), Inputs(11, 1))';
     
     % In order to find the frequency and amplitude of the signal will look at
     % the last 5 seconds of the signal, at this point the system should have
