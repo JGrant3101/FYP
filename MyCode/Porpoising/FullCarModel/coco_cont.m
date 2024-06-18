@@ -11,80 +11,66 @@ Inputs(1, 1) = 50;
 % Unsprung rear mass (kg)
 Inputs(2, 1) = 50;
 % Sprung mass (kg)
-Inputs(3, 1) = 600;
+Inputs(3, 1) = 650;
 % Sprung mass moment of inertia (kgm^2)
-Inputs(4, 1) = 670;
+Inputs(4, 1) = 710;
 % Distance from front axle to CoG (m)
 Inputs(5, 1) = 1.98;
 % Distance from rear axle to CoG (m)
 Inputs(6, 1) = 1.62;
 % Front tyre vertical stiffness (N/m)
-Inputs(7, 1) = 2 * 2.7 * 10^5;
+Inputs(7, 1) = 1.5 * 2.7 * 10^5;
 % Front Suspension stiffness (N/m)
 Inputs(8, 1) = 1.5 * 2 * 10^5;
 % Rear tyre vertical stiffness (N/m)
-Inputs(9, 1) =  2 * 0.9 * 2.7 * 10^5;
+Inputs(9, 1) =  1.5 * 0.9 * 2.7 * 10^5;
 % Rear Suspension stiffness (N/m)
 Inputs(10, 1) = 1.5 * 1.81 * 10^5;
 % Front damping (Ns/m)
-Inputs(11, 1) = 9247;
+Inputs(11, 1) = 10434;
 % Rear damping (Ns/m)
-Inputs(12, 1) = 9739;
+Inputs(12, 1) = 10992;
 % Static front ride height (m)
 Inputs(13, 1) = 0.0943;
 % Static rear ride height (m)
 Inputs(14, 1) = 0.11;
 % Car speed (kph)
-Inputs(15, 1) = 270;
+Inputs(15, 1) = 210;
 % Front wing aero multiplier
 Inputs(16, 1) = 0.254;
 % Rear wing aero multiplier
 Inputs(17, 1) = 0.636;
-% Front downforce from floor gradient
-Inputs(18, 1) = 0.5;
-% Front downforce from floor constant
-Inputs(41, 1) = 0.3;
 
 % Reading in the mat file that contains the parameters needed for the floor
 % aero model
 load("AeroValues.mat")
 
 % Downforce from floor polynomial terms
-Inputs(19, 1) = fittedDWFfunc.p00;
-Inputs(20, 1) = fittedDWFfunc.p10;
-Inputs(21, 1) = fittedDWFfunc.p01;
-Inputs(22, 1) = fittedDWFfunc.p20;
-Inputs(23, 1) = fittedDWFfunc.p11;
-Inputs(24, 1) = fittedDWFfunc.p02;
-Inputs(25, 1) = fittedDWFfunc.p30;
-Inputs(26, 1) = fittedDWFfunc.p21;
-Inputs(27, 1) = fittedDWFfunc.p12;
-Inputs(28, 1) = fittedDWFfunc.p03;
-%Inputs(29, 1) = fittedDWFfunc.p40;
-Inputs(29, 1) = fittedDWFfunc.p31;
-Inputs(30, 1) = fittedDWFfunc.p22;
-Inputs(31, 1) = fittedDWFfunc.p13;
-Inputs(32, 1) = fittedDWFfunc.p04;
-%Inputs(34, 1) = fittedDWFfunc.p50;
-%Inputs(35, 1) = fittedDWFfunc.p41;
-Inputs(33, 1) = fittedDWFfunc.p32;
-Inputs(34, 1) = fittedDWFfunc.p23;
-Inputs(35, 1) = fittedDWFfunc.p14;
-Inputs(36, 1) = fittedDWFfunc.p05;
-Inputs(37, 1) = avgRHmean;
-Inputs(38, 1) = avgRHstd;
-Inputs(39, 1) = vCarmean;
-Inputs(40, 1) = vCarstd;
-
-% Floor road interaction parameters
-% Coefficient of resitution
-Inputs(42, 1) = 0.8;
+Inputs(18, 1) = fittedDWFfunc.p00;
+Inputs(19, 1) = fittedDWFfunc.p10;
+Inputs(20, 1) = fittedDWFfunc.p01;
+Inputs(21, 1) = fittedDWFfunc.p20;
+Inputs(22, 1) = fittedDWFfunc.p11;
+Inputs(23, 1) = fittedDWFfunc.p02;
+Inputs(24, 1) = fittedDWFfunc.p30;
+Inputs(25, 1) = fittedDWFfunc.p21;
+Inputs(26, 1) = fittedDWFfunc.p12;
+Inputs(27, 1) = fittedDWFfunc.p03;
+Inputs(28, 1) = fittedDWFfunc.p31;
+Inputs(29, 1) = fittedDWFfunc.p22;
+Inputs(30, 1) = fittedDWFfunc.p13;
+Inputs(31, 1) = fittedDWFfunc.p04;
+Inputs(32, 1) = fittedDWFfunc.p32;
+Inputs(33, 1) = fittedDWFfunc.p23;
+Inputs(34, 1) = fittedDWFfunc.p14;
+Inputs(35, 1) = fittedDWFfunc.p05;
+Inputs(36, 1) = avgRHmean;
+Inputs(37, 1) = avgRHstd;
+Inputs(38, 1) = vCarmean;
+Inputs(39, 1) = vCarstd;
 
 % Defining our initial x array
-% x0 = [-31.1e-3;-8.4e-3;0;0];
-% x0 = [-0.01; -0.01; -0.02; 0.0044; 0; 0; 0; 0];
 x0 = [-0.02; -0.03; -0.07; -0.009; 0; 0; 0; 0];
-% x0 = [0;0;0;0];
 
 % Defining the names of the inputs already written above
 pnames = {'MuF' 'MuR' 'Ms' 'Is' 'LF' 'LR' 'KtF' 'KsF' 'KtR' 'KsR' 'CsF' 'CsR' 'StaticFRH' 'StaticRRH' 'vCar' 'AF' 'AR' 'm' 'p00' 'p10' ...
@@ -96,7 +82,7 @@ prob = coco_prob();
 prob = coco_set(prob, 'ep', 'NSA', true);
 
 % Defining the functions
-SystemSetup = {@Suspension}; %, @Suspension_dx, @Suspension_dp};
+SystemSetup = {@Suspension};
 
 % Defining the function arguments
 args = {SystemSetup{:}, x0, pnames, Inputs};
@@ -111,18 +97,12 @@ prob = coco_set(prob, 'cont', 'PtMX', 500);
 % Increase the number of Iterations
 %prob = coco_set(prob, 'cont', 'ItMX', 50);
 
-% Adding the lyapunov function 
-% [data, uidx] = coco_get_func_data(prob, 'ep', 'data', 'uidx');
-% 
-% prob = coco_add_func(prob, 'lyap', @lyapunov, data.ep_eqn, 'regular', 'L1', 'uidx', uidx);
-
 %% Varying single parameter to find HB points
 
 % Calling function to vary a parameter and run a continuation
 param = 'vCar';
 Index = 15;
-bdread0 = varyingparameters(param, [50 350], prob, args, Inputs);
-
+bdread0 = varyingparameters(param, [100 250], prob, args, Inputs);
 %% Further inspection of these HB points
 
 labs = coco_bd_labs(bdread0, 'HB');
@@ -158,14 +138,10 @@ for i = 1:length(labs)
     % future will have a PO contin run on them
     minparamep = min(coco_bd_col(bdread0, param));
     maxparamep = max(coco_bd_col(bdread0, param));
-    % minparamep = 286;
-    % maxparamep = 310;
     arrayparamep = linspace(minparamep, maxparamep, 11);
 
     % Adding an event to get points of interest
     prob1 = coco_add_event(prob1, 'POI', param, arrayparamep);
-
-    % prob1 = coco_add_slot(prob1, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
 
     % Running COCO
     HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[50 350], [0.2 2]});

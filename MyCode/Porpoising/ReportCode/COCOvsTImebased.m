@@ -32,9 +32,7 @@ Inputs(10, 1) = 2.4;
 Inputs(11, 1) = 0.31*(500/9)^2;
 
 % Defining our initial x array
-% x0 = [-31.1e-3;-8.4e-3;0;0];
 x0 = [-0.0371;-0.01;0;0];
-% x0 = [0;0;0;0];
 
 % Defining the names of the inputs already written above
 pnames = {'Ms' 'Mu' 'Ks' 'Cs' 'Kt' 'H' 'vCar' 'A' 'mew' 'lamda' 'scaling'};
@@ -50,7 +48,7 @@ SystemSetup = {@Suspension}; %, @Suspension_dx, @Suspension_dp};
 args = {SystemSetup{:}, x0, pnames, Inputs};
 
 % Change the maximum step size
-prob = coco_set(prob, 'cont', 'h_max', 10);
+prob = coco_set(prob, 'cont', 'h_max', 1);
 
 prob = coco_set(prob, 'cont', 'h_min', 1e-10);
 
@@ -58,10 +56,10 @@ prob = coco_set(prob, 'cont', 'h_min', 1e-10);
 prob = coco_set(prob, 'cont', 'PtMX', 500);
 
 % Calling function to vary a parameter and run a continuation
-param = 'Cs';
-Index = 4;
+param = 'vCar';
+Index = 7;
 
-bdread0 = varyingparameters(param, [500 10000], prob, args, Inputs);
+bdread0 = varyingparameters(param, [50 350], prob, args, Inputs);
 
 % Plotting the HB point of the initial system
 figure; clf; hold on
@@ -92,8 +90,6 @@ for i = 1:length(labs)
     prob2 = coco_set(prob2, 'EP', 'TOL', 1e-3);
     prob2 = coco_set(prob2, 'PO', 'TOL', 1e-3);
     prob2 = coco_set(prob2, 'ATLAS', 'TOL', 1e-3);
-    % prob2 = coco_set(prob2, 'cont', 'norm', inf);
-    % prob2 = coco_set(prob2, 'coll', 'NCOL', 8);
 
     % Tell COCO to store extra information about the periodic orbits
     prob2 = coco_add_slot(prob2, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
@@ -138,7 +134,7 @@ for i = 1:length(labs)
     ylabel('Zs (m)')
     title('EP and PO values of Zs across vCar range')
     xlim([290 360])
-    fontsize(gca, 20, 'points')
+    fontsize(gca, 40, 'points')
 
     legend('Ep values', 'Stable PO results', 'Unstable PO results')
     % Plotting the Zu results
@@ -162,7 +158,7 @@ for i = 1:length(labs)
     ylabel('Zu (m)')
     title('EP and PO values of Zu across vCar range')
     xlim([290 360])
-    fontsize(gca, 20, 'points')
+    fontsize(gca, 40, 'points')
 
     legend('Ep values', 'Stable PO results', 'Unstable PO results')
 
@@ -184,7 +180,7 @@ for i = 1:length(labs)
     ylabel('Ride height (m)')
     title('EP and PO values of ride height across vCar range')
     xlim([290 360])
-    fontsize(gca, 20, 'points')
+    fontsize(gca, 40, 'points')
 
     legend('Ep values', 'Stable PO results', 'Unstable PO results')
 end
@@ -222,8 +218,6 @@ for i = 1:N
     % Run the simulation and plot the results
     sol = ode45(@(t, x)SuspensionWithTime(t, x, Inputs), [0, maxtime], [-0.031; -0.008; 0; 0; 0; 0], odeset('RelTol', 1e-8)); % Simulate 
     DWFFloorResults = DWFFloor((Inputs(6, 1) + sol.y(1, :) + sol.y(2, :))', Inputs(9, 1), Inputs(10, 1), Inputs(11, 1))';
-    % tiledlayout(1, 3); nexttile; plot(sol.x, sol.y(1, :)); xlabel('Time (secs)'); ylabel('Zs (m)');nexttile; plot(sol.x, sol.y(2, :)); ...
-        % xlabel('Time (secs)');ylabel('Zu (m)');nexttile;plot(sol.x,Inputs(6, 1)+ sol.y(1, :) + sol.y(2, :)); xlabel('Time (secs)'); ylabel('Ride height (m)')
     
     % In order to find the frequency and amplitude of the signal will look at
     % the last 5 seconds of the signal, at this point the system should have
@@ -303,17 +297,6 @@ for i = 1:N
     zuAmplitudes(i) = zuMaxAverage - zuMinAverage;
     rideheightAmplitudes(i) = rideheightMaxAverage - rideheightMinAverage;
     
-    % Printing these values
-    % temp = sprintf('From time based sims the amplitude of the Zs signal is %d', zsAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    % temp = sprintf('From time based sims the amplitude of the Zu signal is %d', zuAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    % temp = sprintf('From time based sims the amplitude of the ride height signal is %d', rideheightAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    
     % Now to calculate the frequencies, the number of full periods in the time
     % period is the same as the length of the smaller array of mins or maxes
     % for each signal
@@ -340,20 +323,6 @@ for i = 1:N
     else
         rideheightFreqs(i) = Numrideheight / (sol.x(rideheightMinIndices(end)) - sol.x(rideheightMinIndices(1)));
     end
-    
-    % Printing these values
-    % disp(' ')
-    % temp = sprintf('From time based sims the frequency of the Zs signal is %d', zsFreq);
-    % temp = temp + " (Hz)";
-    % disp(temp)
-    % temp = sprintf('From time based sims the frequency of the Zu signal is %d', zuFreq);
-    % temp = temp + " (Hz)";
-    % disp(temp)
-    % temp = sprintf('From time based sims the frequency of the ride height signal is %d', rideheightFreq);
-    % temp = temp + " (Hz)";
-    % disp(temp)
-    
-
 
     % Values from COCO
     % COCO has already calculated everything we need we just need to extract it
@@ -375,19 +344,7 @@ for i = 1:N
     COCOzuAmplitudes(i) = zumax - zumin;
     % Will simply sum these together to get the overall ride heigh amplitude
     COCOrideheightAmplitudes(i) = COCOzsAmplitudes(i) + COCOzuAmplitudes(i);
-    
-    % Printing these values
-    % disp(' ')
-    % temp = sprintf('From COCO the amplitude of the Zs signal is %d', COCOzsAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    % temp = sprintf('From COCO the amplitude of the Zu signal is %d', COCOzuAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    % temp = sprintf('From COCO the amplitude of the ride height signal is %d', COCOrideheightAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    
+
     % Now want to extract the period from our COCO data in order to get the
     % frequency of the oscillations at this point according to COCO, this will
     % just be one value
@@ -398,10 +355,6 @@ for i = 1:N
     
     % Can now get the frequency and print it
     COCOFreqs(i) = 1/TimePeriod;
-    % disp(' ')
-    % temp = sprintf('From COCO the frequency of the signal is %d', COCOFreq);
-    % temp = temp + " (Hz)";
-    % disp(temp)
 end
 
 % Plotting the results

@@ -52,5 +52,3 @@ rhs(3, :) = -(Ks./Ms) .* Zs + (Ks./Ms) .* Zu - (Cs./Ms) .* Phis + (Cs./Ms) .* Ph
 rhs(4, :) = (Ks./Mu) .* Zs - ((Ks./Mu) + (Kt./Mu)) .* Zu + (Cs./Mu) .* Phis - (Cs./Mu) .* Phiu;
 
 end
-
-

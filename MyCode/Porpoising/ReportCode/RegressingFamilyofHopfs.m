@@ -14,6 +14,7 @@ xlabel('Normalised Ks')
 ylabel('vCar (kph)')
 legend('COCO', 'Polynomial')
 title('vCar vs normalised Ks')
+fontsize(gca, 20, 'points')
 
 percentdiff = ((vCarPredictions - vCar) ./ vCar) * 100;
 avgpercentdiff = mean(percentdiff);

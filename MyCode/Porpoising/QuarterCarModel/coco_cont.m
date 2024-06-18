@@ -22,17 +22,15 @@ Inputs(6, 1) = 0.1;
 Inputs(7, 1) = 280;
 % Upper downforce elements multiplier
 Inputs(8, 1) = 0.365;
-% Mean for Inverse Gaussian distribution
+% Mean for Log Normal Distribution
 Inputs(9, 1) = 0.0001;
-% Shape factor for Inverse Gaussian distribution
+% Shape factor for Log Normal Distribution
 Inputs(10, 1) = 2.4;
-% Scaling applied to Inverse Gaussian distribution
+% Scaling applied to Log Normal Distribution
 Inputs(11, 1) = 0.31*(500/9)^2;
 
 % Defining our initial x array
-% x0 = [-31.1e-3;-8.4e-3;0;0];
 x0 = [-0.0371;-0.01;0;0];
-% x0 = [0;0;0;0];
 
 % Defining the names of the inputs already written above
 pnames = {'Ms' 'Mu' 'Ks' 'Cs' 'Kt' 'H' 'vCar' 'A' 'mew' 'lamda' 'scaling'};
@@ -42,7 +40,7 @@ prob = coco_prob();
 prob = coco_set(prob, 'ep', 'NSA', true);
 
 % Defining the functions
-SystemSetup = {@Suspension}; %, @Suspension_dx, @Suspension_dp};
+SystemSetup = {@Suspension};
 
 % Defining the function arguments
 args = {SystemSetup{:}, x0, pnames, Inputs};
@@ -57,10 +55,6 @@ prob = coco_set(prob, 'cont', 'PtMX', 500);
 % Increase the number of Iterations
 %prob = coco_set(prob, 'cont', 'ItMX', 50);
 
-% Adding the lyapunov function 
-% [data, uidx] = coco_get_func_data(prob, 'ep', 'data', 'uidx');
-% 
-% prob = coco_add_func(prob, 'lyap', @lyapunov, data.ep_eqn, 'regular', 'L1', 'uidx', uidx);
 
 %% Varying single parameter to find HB points
 
@@ -74,6 +68,7 @@ figure; clf; hold on
 thm1 = struct('special', {{'HB', 'EP'}});
 coco_plot_bd(thm1, 'Initial', 'vCar', '||x||_2')
 title('Graph of the equilibrium point of the system as car speed varies')
+fontsize(gca, 20, 'points')
 grid on
 %% Further inspection of these HB points
 
@@ -110,14 +105,10 @@ for i = 1:length(labs)
     % future will have a PO contin run on them
     minparamep = min(coco_bd_col(bdread0, param));
     maxparamep = max(coco_bd_col(bdread0, param));
-    % minparamep = 286;
-    % maxparamep = 310;
     arrayparamep = linspace(minparamep, maxparamep, 11);
 
     % Adding an event to get points of interest
     prob1 = coco_add_event(prob1, 'POI', param, arrayparamep);
-
-    % prob1 = coco_add_slot(prob1, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
 
     % Running COCO
     HBbd{i} = coco(prob1, sprintf('Test%d', i), [], {param, param4HB}, {[50 350], [10000 400000]});
@@ -138,7 +129,7 @@ for i = 1:length(labs)
     [~,column] = find(strcmp(bdread0,'||x||_2'));
     scatter(Inputs(Index4HB, 1), 300.73, 100, 'green', 'square', 'filled')
     title(['Family of HB points for varying ' param4HB])
-    hold off; grid on; fontsize(gca, 20, 'points')% view(3)
+    hold off; grid on; fontsize(gca, 20, 'points')
     
     % Want to plot a series of curves that show the values of Zs and Zu
     % around the equilibirum after the HB point
@@ -147,88 +138,88 @@ for i = 1:length(labs)
     
     % Run a for loop within this for loop to get the HB2PO continuations
     % for each of the chosen HB points
-    % for j = 1:length(HBlabs)
-    %     prob2 = coco_prob();
-    %     prob2 = coco_set(prob2, 'coll', 'NTST', 1000);
-    %     prob2 = coco_set(prob2, 'po', 'bifus', true);
-    %     prob2 = ode_HB2po(prob2, '', sprintf('Test%d', i), HBlabs(j));
-    %     prob2 = coco_set(prob2, 'cont', 'PtMX', 200);
-    %     prob2 = coco_set(prob2, 'cont', 'ItMX', 1500);
-    %     prob2 = coco_set(prob2, 'cont', 'h_min', 1e-10);
-    %     prob2 = coco_set(prob2, 'cont', 'NAdapt', 1, 'h_max', 1);
-    %     % 
-    %     % % Tell COCO to store extra information about the periodic orbits
-    %     prob2 = coco_add_slot(prob2, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
-    % 
-    %     Po{i} = coco(prob2, sprintf('po_run%d', i), [], 1, {param 'po.period'}, [50 350]);
-    % 
-    %     if Po{1, 1}{2, 1} ~= -1
-    %         % Updating inputs before running an EP about the new point for
-    %         % plotting
-    %         Inputsep = Inputs;
-    %         Inputsep(7, 1) = 20;
-    %         Inputsep(Index4HB, 1) = Po{1, 1}{2, Index4HB + 8};
-    % 
-    %         args = {SystemSetup{:}, x0, pnames, Inputsep};
-    % 
-    %         variableargs = {1, 'vCar', [10 350]};
-    % 
-    %         % Running a relevant EP for the parameter that was changed
-    %         bdep = coco(prob, sprintf('epfrompo_run%d', j), @ode_isol2ep, args{:}, variableargs{:});
-    % 
-    %         % Plotting Zs results
-    %         % Plotting the ep values
-    %         figure
-    %         xep = coco_bd_col(bdep, 'x')';
-    %         zsep = xep(:, 1);
-    %         vCarep = coco_bd_col(bdep, 'vCar')';
-    % 
-    %         plot(vCarep, zsep)
-    %         hold on
-    % 
-    %         % Plotting the PO values
-    %         vCarPO = coco_bd_col(Po{i}, param);
-    %         x_max = coco_bd_col(Po{i}, 'x_max')';   % Get the state vector
-    %         x_min = coco_bd_col(Po{i}, 'x_min')';   % Get the state vector
-    %         stabpo = coco_bd_col(Po{i}, 'po.test.USTAB') == 0; % Get the stability
-    % 
-    %         zs_max = x_max(1, :);
-    %         zs_min = x_min(1, :);
-    % 
-    %         plot(vCarPO(stabpo), zs_max(stabpo),'.k') ;
-    %         plot(vCarPO(~stabpo), zs_max(~stabpo),'.m') ;
-    %         plot(vCarPO(stabpo), zs_min(stabpo),'.k') ;
-    %         plot(vCarPO(~stabpo), zs_min(~stabpo),'.m') ;
-    % 
-    %         xlabel('vCar (kph)')
-    %         ylabel('Zs (m)')
-    %         title(['EP and PO values of Zs across vCar range with ' param4HB ' set to: ' num2str(Inputsep(Index4HB, 1))])
-    % 
-    %         legend('Ep values', 'Stable PO results', 'Unstable PO results')
-    %         % Plotting the Zu results
-    %         % Plotting the ep values
-    %         figure
-    %         zuep = xep(:, 2);
-    % 
-    %         plot(vCarep, zuep)
-    %         hold on
-    % 
-    %         % Plotting the PO values
-    %         zu_max = x_max(2, :);
-    %         zu_min = x_min(2, :);
-    % 
-    %         plot(vCarPO(stabpo), zu_max(stabpo),'.k') ;
-    %         plot(vCarPO(~stabpo), zu_max(~stabpo),'.m') ;
-    %         plot(vCarPO(stabpo), zu_min(stabpo),'.k') ;
-    %         plot(vCarPO(~stabpo), zu_min(~stabpo),'.m') ;
-    % 
-    %         xlabel('vCar (kph)')
-    %         ylabel('Zu (m)')
-    %         title(['EP and PO values of Zu across vCar range with ' param4HB ' set to: ' num2str(Inputsep(Index4HB, 1))])
-    % 
-    %         legend('Ep values', 'Stable PO results', 'Unstable PO results')
-    %     end
-    % end
+    for j = 1:length(HBlabs)
+        prob2 = coco_prob();
+        prob2 = coco_set(prob2, 'coll', 'NTST', 1000);
+        prob2 = coco_set(prob2, 'po', 'bifus', true);
+        prob2 = ode_HB2po(prob2, '', sprintf('Test%d', i), HBlabs(j));
+        prob2 = coco_set(prob2, 'cont', 'PtMX', 200);
+        prob2 = coco_set(prob2, 'cont', 'ItMX', 1500);
+        prob2 = coco_set(prob2, 'cont', 'h_min', 1e-10);
+        prob2 = coco_set(prob2, 'cont', 'NAdapt', 1, 'h_max', 1);
+        % 
+        % % Tell COCO to store extra information about the periodic orbits
+        prob2 = coco_add_slot(prob2, 'slot_bd_min_max', @slot_bd_min_max, [], 'bddat');
+
+        Po{i} = coco(prob2, sprintf('po_run%d', i), [], 1, {param 'po.period'}, [50 350]);
+
+        if Po{1, 1}{2, 1} ~= -1
+            % Updating inputs before running an EP about the new point for
+            % plotting
+            Inputsep = Inputs;
+            Inputsep(7, 1) = 20;
+            Inputsep(Index4HB, 1) = Po{1, 1}{2, Index4HB + 8};
+
+            args = {SystemSetup{:}, x0, pnames, Inputsep};
+
+            variableargs = {1, 'vCar', [10 350]};
+
+            % Running a relevant EP for the parameter that was changed
+            bdep = coco(prob, sprintf('epfrompo_run%d', j), @ode_isol2ep, args{:}, variableargs{:});
+
+            % Plotting Zs results
+            % Plotting the ep values
+            figure
+            xep = coco_bd_col(bdep, 'x')';
+            zsep = xep(:, 1);
+            vCarep = coco_bd_col(bdep, 'vCar')';
+
+            plot(vCarep, zsep)
+            hold on
+
+            % Plotting the PO values
+            vCarPO = coco_bd_col(Po{i}, param);
+            x_max = coco_bd_col(Po{i}, 'x_max')';   % Get the state vector
+            x_min = coco_bd_col(Po{i}, 'x_min')';   % Get the state vector
+            stabpo = coco_bd_col(Po{i}, 'po.test.USTAB') == 0; % Get the stability
+
+            zs_max = x_max(1, :);
+            zs_min = x_min(1, :);
+
+            plot(vCarPO(stabpo), zs_max(stabpo),'.k') ;
+            plot(vCarPO(~stabpo), zs_max(~stabpo),'.m') ;
+            plot(vCarPO(stabpo), zs_min(stabpo),'.k') ;
+            plot(vCarPO(~stabpo), zs_min(~stabpo),'.m') ;
+
+            xlabel('vCar (kph)')
+            ylabel('Zs (m)')
+            title(['EP and PO values of Zs across vCar range with ' param4HB ' set to: ' num2str(Inputsep(Index4HB, 1))])
+
+            legend('Ep values', 'Stable PO results', 'Unstable PO results')
+            % Plotting the Zu results
+            % Plotting the ep values
+            figure
+            zuep = xep(:, 2);
+
+            plot(vCarep, zuep)
+            hold on
+
+            % Plotting the PO values
+            zu_max = x_max(2, :);
+            zu_min = x_min(2, :);
+
+            plot(vCarPO(stabpo), zu_max(stabpo),'.k') ;
+            plot(vCarPO(~stabpo), zu_max(~stabpo),'.m') ;
+            plot(vCarPO(stabpo), zu_min(stabpo),'.k') ;
+            plot(vCarPO(~stabpo), zu_min(~stabpo),'.m') ;
+
+            xlabel('vCar (kph)')
+            ylabel('Zu (m)')
+            title(['EP and PO values of Zu across vCar range with ' param4HB ' set to: ' num2str(Inputsep(Index4HB, 1))])
+
+            legend('Ep values', 'Stable PO results', 'Unstable PO results')
+        end
+    end
 end
 
 
@@ -251,5 +242,6 @@ function bdread0 = varyingparameters(param2vary, range, prob, args, Inputs)
     xlabel(param2vary)
     ylabel('Equilibrium values (m)')
     legend('Zs (m)', 'Zu (ms)', 'Ride height (m)')
+    fontsize(gca, 20, 'points')
 end
 

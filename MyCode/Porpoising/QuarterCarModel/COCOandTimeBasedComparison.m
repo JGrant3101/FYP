@@ -113,17 +113,6 @@ for i = 1:N
     zuAmplitudes(i) = zuMaxAverage - zuMinAverage;
     rideheightAmplitudes(i) = rideheightMaxAverage - rideheightMinAverage;
     
-    % Printing these values
-    % temp = sprintf('From time based sims the amplitude of the Zs signal is %d', zsAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    % temp = sprintf('From time based sims the amplitude of the Zu signal is %d', zuAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    % temp = sprintf('From time based sims the amplitude of the ride height signal is %d', rideheightAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    
     % Now to calculate the frequencies, the number of full periods in the time
     % period is the same as the length of the smaller array of mins or maxes
     % for each signal
@@ -150,27 +139,13 @@ for i = 1:N
     else
         rideheightFreqs(i) = Numrideheight / (sol.x(rideheightMinIndices(end)) - sol.x(rideheightMinIndices(1)));
     end
-    
-    % Printing these values
-    % disp(' ')
-    % temp = sprintf('From time based sims the frequency of the Zs signal is %d', zsFreq);
-    % temp = temp + " (Hz)";
-    % disp(temp)
-    % temp = sprintf('From time based sims the frequency of the Zu signal is %d', zuFreq);
-    % temp = temp + " (Hz)";
-    % disp(temp)
-    % temp = sprintf('From time based sims the frequency of the ride height signal is %d', rideheightFreq);
-    % temp = temp + " (Hz)";
-    % disp(temp)
-    
-
 
     % Values from COCO
     % COCO has already calculated everything we need we just need to extract it
     % and report it to compare with the time based sim values
     % Want to start by interpolating the min and max values for Zs and Zu,
     % firstly need to ensure everything is only unique values
-    [parampounique ia ib] = unique(vCarPO);
+    [parampounique, ia, ib] = unique(vCarPO);
     x_max_unique = x_max(:, ia);
     x_min_unique = x_min(:, ia);
     
@@ -186,18 +161,6 @@ for i = 1:N
     % Will simply sum these together to get the overall ride heigh amplitude
     COCOrideheightAmplitudes(i) = COCOzsAmplitudes(i) + COCOzuAmplitudes(i);
     
-    % Printing these values
-    % disp(' ')
-    % temp = sprintf('From COCO the amplitude of the Zs signal is %d', COCOzsAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    % temp = sprintf('From COCO the amplitude of the Zu signal is %d', COCOzuAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    % temp = sprintf('From COCO the amplitude of the ride height signal is %d', COCOrideheightAmplitude);
-    % temp = temp + " (m)";
-    % disp(temp)
-    
     % Now want to extract the period from our COCO data in order to get the
     % frequency of the oscillations at this point according to COCO, this will
     % just be one value
@@ -208,10 +171,6 @@ for i = 1:N
     
     % Can now get the frequency and print it
     COCOFreqs(i) = 1/TimePeriod;
-    % disp(' ')
-    % temp = sprintf('From COCO the frequency of the signal is %d', COCOFreq);
-    % temp = temp + " (Hz)";
-    % disp(temp)
 end
 
 % Plotting the results
